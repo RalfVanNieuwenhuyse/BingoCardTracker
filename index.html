@@ -2,7 +2,7 @@
 <html lang="en" class="h-full bg-slate-950">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Multi-Round Freeform Bingo Card Tracker</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
@@ -58,81 +58,94 @@
         ::-webkit-scrollbar-track { background: rgba(15, 23, 42, 0.6); }
         ::-webkit-scrollbar-thumb { background: rgba(51, 65, 85, 0.6); border-radius: 9999px; }
         ::-webkit-scrollbar-thumb:hover { background: rgba(16, 185, 129, 0.8); }
+
+        @media (max-width: 639px) {
+            .mobile-hide-header-text {
+                display: none !important;
+            }
+            .mobile-compact-header {
+                padding-top: 0.5rem !important;
+                padding-bottom: 0.5rem !important;
+            }
+        }
     </style>
 </head>
 <body class="h-full text-slate-100 bg-slate-950 flex flex-col antialiased selection:bg-amber-500 selection:text-slate-950">
 
-    <header class="sticky top-0 z-40 bg-slate-900/90 border-b border-slate-800 backdrop-blur-md">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3 flex flex-wrap items-center justify-between gap-4">
+    <!-- Header / Navbar Optimized for Mobile Phones -->
+    <header class="sticky top-0 z-40 bg-slate-900/95 border-b border-slate-800 backdrop-blur-md">
+        <div class="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 py-2.5 sm:py-3 flex items-center justify-between gap-2 mobile-compact-header">
             
-            <!-- App Logo / Title -->
-            <div class="flex items-center gap-3">
-                <div class="w-10 h-10 rounded-2xl bg-gradient-to-tr from-amber-500 via-emerald-600 to-indigo-600 p-0.5 shadow-lg shadow-emerald-500/20">
-                    <div class="w-full h-full bg-slate-950 rounded-[14px] flex items-center justify-center font-black text-amber-400 text-xl font-heading">
+            <!-- App Logo / Compact Title on Mobile -->
+            <div class="flex items-center gap-2.5 shrink-0">
+                <div class="w-8 h-8 sm:w-10 sm:h-10 rounded-xl sm:rounded-2xl bg-gradient-to-tr from-amber-500 via-emerald-600 to-indigo-600 p-0.5 shadow-lg shadow-emerald-500/20">
+                    <div class="w-full h-full bg-slate-950 rounded-[10px] sm:rounded-[14px] flex items-center justify-center font-black text-amber-400 text-base sm:text-xl font-heading">
                         B
                     </div>
                 </div>
                 <div>
-                    <div class="flex items-center gap-2">
-                        <h1 class="text-xl font-extrabold tracking-tight text-white font-heading">Bingo Tracker</h1>
-                        <span class="text-[10px] font-bold px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 uppercase tracking-wider">
+                    <div class="flex items-center gap-1.5 sm:gap-2">
+                        <h1 class="text-base sm:text-xl font-extrabold tracking-tight text-white font-heading leading-none">Bingo Tracker</h1>
+                        <span class="mobile-hide-header-text text-[10px] font-bold px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 uppercase tracking-wider">
                             Multi-Round
                         </span>
                     </div>
-                    <p class="text-xs text-slate-400">Setup rounds & custom freeform cards, then track live calls</p>
+                    <p class="mobile-hide-header-text text-xs text-slate-400 mt-0.5">Setup rounds & custom freeform cards, then track live calls</p>
                 </div>
             </div>
 
             <!-- Main Workflow Tabs (1. Setup -> 2. Live Game) -->
-            <nav class="flex items-center gap-1.5 bg-slate-950/90 p-1.5 rounded-2xl border border-slate-800">
-                <button id="tab-cards-btn" onclick="switchTab('cards')" class="px-4 py-2 rounded-xl text-sm font-bold transition flex items-center gap-2 bg-emerald-600 text-white shadow-md shadow-emerald-600/30">
-                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"></path></svg>
-                    1. Setup Rounds & Cards (<span id="header-round-count">0</span>)
+            <nav class="flex items-center gap-1 bg-slate-950/90 p-1 rounded-xl sm:rounded-2xl border border-slate-800">
+                <button id="tab-cards-btn" onclick="switchTab('cards')" class="px-2.5 sm:px-4 py-1.5 sm:py-2 rounded-lg sm:rounded-xl text-xs sm:text-sm font-bold transition flex items-center gap-1.5 bg-emerald-600 text-white shadow-md shadow-emerald-600/30">
+                    <svg class="w-3.5 h-3.5 sm:w-4 sm:h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"></path></svg>
+                    <span>1. Setup (<span id="header-round-count">0</span>)</span>
                 </button>
-                <button id="tab-play-btn" onclick="switchTab('play')" class="px-4 py-2 rounded-xl text-sm font-semibold text-slate-400 hover:text-white hover:bg-slate-800 transition flex items-center gap-2">
-                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
-                    2. Live Game Tracker
+                <button id="tab-play-btn" onclick="switchTab('play')" class="px-2.5 sm:px-4 py-1.5 sm:py-2 rounded-lg sm:rounded-xl text-xs sm:text-sm font-semibold text-slate-400 hover:text-white hover:bg-slate-800 transition flex items-center gap-1.5">
+                    <svg class="w-3.5 h-3.5 sm:w-4 sm:h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                    <span>2. Live Game</span>
                 </button>
             </nav>
 
         </div>
     </header>
 
-    <main class="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6">
+    <main class="flex-1 max-w-7xl w-full mx-auto px-3 sm:px-6 lg:px-8 py-4 sm:py-6">
 
-        <!-- ================= TAB 1: SETUP ROUNDS & CARDS (DEFAULT MAIN TAB) ================= -->
-        <section id="view-cards" class="space-y-6">
+        <!-- ================= TAB 1: SETUP ROUNDS & CARDS ================= -->
+        <section id="view-cards" class="space-y-4 sm:space-y-6">
             
-            <!-- Setup Header Bar with Prominent "Start Live Game ➔" Button -->
-            <div class="glass-panel p-6 rounded-3xl border border-slate-800 flex flex-col lg:flex-row justify-between items-start lg:items-center gap-4">
+            <!-- Setup Header Bar -->
+            <div class="glass-panel p-4 sm:p-6 rounded-2xl sm:rounded-3xl border border-slate-800 flex flex-col lg:flex-row justify-between items-start lg:items-center gap-4">
                 <div>
-                    <h2 class="text-xl font-bold text-white font-heading">Round & Card Setup</h2>
-                    <p class="text-xs text-slate-400 mt-1">Configure game rounds, add freeform cards, or import existing sets before launching live tracking.</p>
+                    <h2 class="text-lg sm:text-xl font-bold text-white font-heading">Round & Card Setup</h2>
+                    <p class="text-xs text-slate-400 mt-0.5 sm:mt-1">Configure game rounds, add freeform cards, or import/export data.</p>
                 </div>
                 
-                <div class="flex flex-wrap items-center gap-2.5 w-full lg:w-auto">
-                    <button onclick="switchTab('play')" class="px-5 py-2.5 bg-gradient-to-r from-emerald-500 to-emerald-600 hover:from-emerald-400 hover:to-emerald-500 text-slate-950 font-black text-xs rounded-xl transition shadow-lg shadow-emerald-500/20 flex items-center gap-2 font-heading tracking-wide uppercase">
+                <div class="flex flex-wrap items-center gap-2 w-full lg:w-auto">
+                    <button onclick="switchTab('play')" class="px-4 py-2 bg-gradient-to-r from-emerald-500 to-emerald-600 hover:from-emerald-400 hover:to-emerald-500 text-slate-950 font-black text-xs rounded-xl transition shadow-lg shadow-emerald-500/20 flex items-center gap-1.5 font-heading tracking-wide uppercase">
                         Start Live Game ➔
                     </button>
-                    <button onclick="openRoundModal()" class="px-4 py-2.5 bg-purple-600 hover:bg-purple-500 text-white text-xs font-bold rounded-xl transition shadow-lg shadow-purple-600/20 flex items-center gap-2">
-                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path></svg>
+                    <button onclick="openRoundModal()" class="px-3.5 py-2 bg-purple-600 hover:bg-purple-500 text-white text-xs font-bold rounded-xl transition shadow-lg shadow-purple-600/20 flex items-center gap-1.5">
+                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path></svg>
                         New Round
                     </button>
-                    <button onclick="openCardModal()" class="px-4 py-2.5 bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-bold rounded-xl transition shadow-lg shadow-indigo-600/20 flex items-center gap-2">
-                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg>
-                        Add Freeform Card
+                    <button onclick="openCardModal()" class="px-3.5 py-2 bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-bold rounded-xl transition shadow-lg shadow-indigo-600/20 flex items-center gap-1.5">
+                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg>
+                        Add Card
                     </button>
-                    <button onclick="loadSampleGame()" class="px-3.5 py-2.5 bg-amber-500/10 hover:bg-amber-500/20 text-amber-400 text-xs font-semibold rounded-xl border border-amber-500/20 transition">
-                        Load Demo Set
+                    <button onclick="loadSampleGame()" class="px-3 py-2 bg-amber-500/10 hover:bg-amber-500/20 text-amber-400 text-xs font-semibold rounded-xl border border-amber-500/20 transition">
+                        Demo Set
                     </button>
-                    <button onclick="exportDataJSON()" class="px-3 py-2.5 bg-slate-900 hover:bg-slate-800 text-slate-300 text-xs font-semibold rounded-xl border border-slate-800 transition" title="Export JSON">
+                    <button onclick="handleExportData()" class="px-3 py-2 bg-slate-900 hover:bg-slate-800 text-slate-300 text-xs font-semibold rounded-xl border border-slate-800 transition flex items-center gap-1" title="Export JSON / Share">
+                        <svg class="w-3.5 h-3.5 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"></path></svg>
                         Export
                     </button>
-                    <label class="px-3 py-2.5 bg-slate-900 hover:bg-slate-800 text-slate-300 text-xs font-semibold rounded-xl border border-slate-800 transition cursor-pointer">
-                        Import <input type="file" accept=".json" onchange="importDataJSON(event)" class="hidden">
-                    </label>
-                    <button type="button" onclick="deleteAllData()" class="px-3 py-2.5 bg-rose-500/10 hover:bg-rose-500/20 text-rose-400 text-xs font-semibold rounded-xl border border-rose-500/20 transition">
-                        Clear All Data
+                    <button onclick="openImportModal()" class="px-3 py-2 bg-slate-900 hover:bg-slate-800 text-slate-300 text-xs font-semibold rounded-xl border border-slate-800 transition flex items-center gap-1">
+                        <svg class="w-3.5 h-3.5 text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg>
+                        Import
+                    </button>
+                    <button type="button" onclick="deleteAllData()" class="px-3 py-2 bg-rose-500/10 hover:bg-rose-500/20 text-rose-400 text-xs font-semibold rounded-xl border border-rose-500/20 transition">
+                        Clear All
                     </button>
                 </div>
             </div>
@@ -143,12 +156,12 @@
             </div>
 
             <!-- Setup Cards Grid -->
-            <div id="setup-cards-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <div id="setup-cards-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
                 <!-- Populated dynamically via JS -->
             </div>
 
             <!-- Empty Setup State -->
-            <div id="empty-setup-state" class="text-center py-20 bg-slate-900/30 rounded-3xl border border-dashed border-slate-800">
+            <div id="empty-setup-state" class="text-center py-16 sm:py-20 bg-slate-900/30 rounded-3xl border border-dashed border-slate-800">
                 <div class="w-16 h-16 bg-slate-900 rounded-3xl flex items-center justify-center mx-auto mb-4 text-slate-500 border border-slate-800">
                     <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"></path></svg>
                 </div>
@@ -163,57 +176,56 @@
         </section>
 
         <!-- ================= TAB 2: LIVE GAME TRACKER ================= -->
-        <section id="view-play" class="hidden space-y-6">
+        <section id="view-play" class="hidden space-y-4 sm:space-y-6">
             
             <!-- Round Selection Bar with Back To Setup Button -->
-            <div class="glass-panel p-4 rounded-3xl border border-slate-800 flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
-                <div class="flex items-center gap-3 w-full md:w-auto overflow-x-auto pb-2 md:pb-0 scrollbar-none" id="live-round-pills">
+            <div class="glass-panel p-3.5 sm:p-4 rounded-2xl sm:rounded-3xl border border-slate-800 flex flex-col md:flex-row justify-between items-start md:items-center gap-3">
+                <div class="flex items-center gap-2 sm:gap-3 w-full md:w-auto overflow-x-auto pb-1 md:pb-0 scrollbar-none" id="live-round-pills">
                     <!-- Dynamic Round Pills with Status Badges -->
                 </div>
 
-                <div class="flex items-center gap-3 shrink-0 self-end md:self-auto">
-                    <button onclick="switchTab('cards')" class="px-3.5 py-1.5 text-xs font-bold bg-slate-900 hover:bg-slate-800 text-slate-300 rounded-xl border border-slate-700 transition flex items-center gap-1.5">
-                        <span>⚙️ Edit Setup / Cards</span>
+                <div class="flex items-center justify-between sm:justify-end gap-3 w-full md:w-auto shrink-0 border-t border-slate-800/80 md:border-t-0 pt-2 md:pt-0">
+                    <button onclick="switchTab('cards')" class="px-3 py-1.5 text-xs font-bold bg-slate-900 hover:bg-slate-800 text-slate-300 rounded-xl border border-slate-700 transition flex items-center gap-1.5">
+                        <span>⚙️ Setup</span>
                     </button>
-                    <!-- Global vs Per-Round Toggle -->
                     <label class="flex items-center gap-2 text-xs font-semibold text-slate-400 bg-slate-950/80 px-3 py-1.5 rounded-xl border border-slate-800 cursor-pointer select-none">
                         <input type="checkbox" id="global-drawn-toggle" onchange="toggleGlobalDrawnMode(this.checked)" class="rounded bg-slate-900 border-slate-700 text-emerald-500 focus:ring-0">
-                        <span>Share Called Numbers Across All Rounds</span>
+                        <span>Global Calls Across Rounds</span>
                     </label>
                 </div>
             </div>
 
-            <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-4 sm:gap-6 items-start">
                 
                 <!-- Left Column: Called Number Entry & Collapsible Quick Keypad -->
-                <div class="lg:col-span-4 space-y-5">
+                <div class="lg:col-span-4 space-y-4 sm:space-y-5">
                     
                     <!-- Rapid Call Input Panel -->
-                    <div class="glass-panel p-5 rounded-3xl relative overflow-hidden shadow-2xl border border-slate-800">
-                        <div class="flex justify-between items-center mb-3">
+                    <div class="glass-panel p-4 sm:p-5 rounded-2xl sm:rounded-3xl relative overflow-hidden shadow-2xl border border-slate-800">
+                        <div class="flex justify-between items-center mb-2.5">
                             <span class="text-xs font-bold text-slate-400 uppercase tracking-wider">Number Call Entry</span>
                             <span class="text-xs text-amber-400 font-semibold flex items-center gap-1.5">
-                                <span class="w-2 h-2 rounded-full bg-amber-400 animate-ping"></span> Live Tracking
+                                <span class="w-2 h-2 rounded-full bg-amber-400 animate-ping"></span> Live
                             </span>
                         </div>
 
                         <!-- Form Input -->
-                        <form onsubmit="handleCallSubmit(event)" class="flex gap-2 mb-4">
-                            <input type="number" id="drawn-input" min="1" max="999" placeholder="Enter #" class="flex-1 bg-slate-950 border border-slate-700 focus:border-amber-500 rounded-2xl px-4 py-3 text-center text-2xl font-black text-white focus:outline-none focus:ring-2 focus:ring-amber-500/30 transition placeholder-slate-700 font-heading" autocomplete="off" autofocus>
-                            <button type="submit" class="px-6 py-3 bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-slate-950 font-black text-base rounded-2xl transition shadow-lg shadow-amber-500/20 active:scale-95 flex items-center justify-center font-heading tracking-wide">
+                        <form onsubmit="handleCallSubmit(event)" class="flex gap-2 mb-3.5">
+                            <input type="number" id="drawn-input" min="1" max="999" placeholder="#" class="flex-1 bg-slate-950 border border-slate-700 focus:border-amber-500 rounded-xl sm:rounded-2xl px-3 sm:px-4 py-2.5 sm:py-3 text-center text-xl sm:text-2xl font-black text-white focus:outline-none focus:ring-2 focus:ring-amber-500/30 transition placeholder-slate-700 font-heading" autocomplete="off" autofocus>
+                            <button type="submit" class="px-5 sm:px-6 py-2.5 sm:py-3 bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-slate-950 font-black text-sm sm:text-base rounded-xl sm:rounded-2xl transition shadow-lg shadow-amber-500/20 active:scale-95 flex items-center justify-center font-heading tracking-wide">
                                 DRAW
                             </button>
                         </form>
 
                         <!-- Call Status & History Controls -->
-                        <div class="flex items-center justify-between p-3.5 bg-slate-950/80 rounded-2xl border border-slate-800">
+                        <div class="flex items-center justify-between p-3 sm:p-3.5 bg-slate-950/80 rounded-xl sm:rounded-2xl border border-slate-800">
                             <div>
                                 <span class="block text-[10px] font-bold text-slate-500 uppercase tracking-widest">Last Called</span>
-                                <span id="display-last-called" class="text-3xl font-black text-amber-400 font-heading">--</span>
+                                <span id="display-last-called" class="text-2xl sm:text-3xl font-black text-amber-400 font-heading">--</span>
                             </div>
                             <div class="text-right">
                                 <span class="block text-[10px] font-bold text-slate-500 uppercase tracking-widest">Total Called</span>
-                                <span id="display-total-drawn" class="text-xl font-bold text-white font-heading">0</span>
+                                <span id="display-total-drawn" class="text-lg sm:text-xl font-bold text-white font-heading">0</span>
                             </div>
                             <button onclick="undoLastDrawn()" id="undo-btn" disabled class="px-3 py-2 text-xs font-bold bg-slate-900 hover:bg-slate-800 text-slate-300 disabled:opacity-30 rounded-xl border border-slate-800 transition flex items-center gap-1">
                                 <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h10a8 8 0 018 8v2M3 10l6 6m-6-6l6-6"></path></svg>
@@ -223,7 +235,7 @@
                     </div>
 
                     <!-- Collapsible Quick Keypad (1 - 90) -->
-                    <div class="glass-panel p-4 rounded-3xl border border-slate-800 space-y-3">
+                    <div class="glass-panel p-3.5 sm:p-4 rounded-2xl sm:rounded-3xl border border-slate-800 space-y-3">
                         <div class="flex justify-between items-center px-1 cursor-pointer select-none" onclick="toggleKeypadCollapse()">
                             <div class="flex items-center gap-2">
                                 <svg id="keypad-chevron" class="w-4 h-4 text-amber-400 transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
@@ -233,14 +245,14 @@
                                 <span id="keypad-toggle-label" class="text-[10px] font-semibold text-slate-400 uppercase tracking-wider">Collapse</span>
                                 <button type="button" onclick="event.stopPropagation(); clearAllDrawnNumbers();" class="text-xs font-semibold text-rose-400 hover:text-rose-300 transition flex items-center gap-1">
                                     <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path></svg>
-                                    Reset Called
+                                    Reset
                                 </button>
                             </div>
                         </div>
 
-                        <!-- Interactive Grid Container with smooth collapse -->
+                        <!-- Interactive Grid Container -->
                         <div id="keypad-collapse-container" class="transition-all duration-300 ease-in-out overflow-hidden max-h-[300px] opacity-100">
-                            <div id="number-pad-grid" class="grid grid-cols-6 sm:grid-cols-9 lg:grid-cols-6 gap-1.5 max-h-[300px] overflow-y-auto pr-1 pt-1">
+                            <div id="number-pad-grid" class="grid grid-cols-6 sm:grid-cols-9 lg:grid-cols-6 gap-1.5 max-h-[280px] sm:max-h-[300px] overflow-y-auto pr-1 pt-1">
                                 <!-- Populated dynamically via JS -->
                             </div>
                         </div>
@@ -249,29 +261,29 @@
                 </div>
 
                 <!-- Right Column: Live Cards for Selected Round -->
-                <div class="lg:col-span-8 space-y-5">
+                <div class="lg:col-span-8 space-y-4 sm:space-y-5">
                     
                     <!-- Filters & Sort Info Bar -->
-                    <div class="glass-panel p-4 rounded-3xl border border-slate-800 flex flex-wrap items-center justify-between gap-4">
-                        <div class="flex items-center gap-1.5 bg-slate-950/80 p-1 rounded-2xl border border-slate-800 text-xs">
-                            <button onclick="setCardFilter('all')" id="filter-all" class="px-3 py-1.5 rounded-xl font-bold transition bg-emerald-600 text-white">All Cards (<span id="count-all">0</span>)</button>
-                            <button onclick="setCardFilter('close')" id="filter-close" class="px-3 py-1.5 rounded-xl font-medium text-slate-400 hover:text-white transition">1-2 Away (<span id="count-close">0</span>)</button>
-                            <button onclick="setCardFilter('bingo')" id="filter-bingo" class="px-3 py-1.5 rounded-xl font-medium text-slate-400 hover:text-white transition">BINGO! (<span id="count-bingo">0</span>)</button>
+                    <div class="glass-panel p-3 sm:p-4 rounded-2xl sm:rounded-3xl border border-slate-800 flex flex-wrap items-center justify-between gap-3">
+                        <div class="flex items-center gap-1 bg-slate-950/80 p-1 rounded-xl sm:rounded-2xl border border-slate-800 text-xs">
+                            <button onclick="setCardFilter('all')" id="filter-all" class="px-2.5 sm:px-3 py-1 sm:py-1.5 rounded-lg sm:rounded-xl font-bold transition bg-emerald-600 text-white">All (<span id="count-all">0</span>)</button>
+                            <button onclick="setCardFilter('close')" id="filter-close" class="px-2.5 sm:px-3 py-1 sm:py-1.5 rounded-lg sm:rounded-xl font-medium text-slate-400 hover:text-white transition">1-2 Away (<span id="count-close">0</span>)</button>
+                            <button onclick="setCardFilter('bingo')" id="filter-bingo" class="px-2.5 sm:px-3 py-1 sm:py-1.5 rounded-lg sm:rounded-xl font-medium text-slate-400 hover:text-white transition">BINGO! (<span id="count-bingo">0</span>)</button>
                         </div>
 
-                        <div class="text-xs text-slate-400 font-medium flex items-center gap-1.5">
-                            <svg class="w-4 h-4 text-amber-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4h13M3 8h9m-9 4h6m4 0l4-4m0 0l4 4m-4-4v12"></path></svg>
+                        <div class="text-[11px] sm:text-xs text-slate-400 font-medium flex items-center gap-1.5">
+                            <svg class="w-3.5 h-3.5 text-amber-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4h13M3 8h9m-9 4h6m4 0l4-4m0 0l4 4m-4-4v12"></path></svg>
                             <span>Sorted by closest to completion</span>
                         </div>
                     </div>
 
                     <!-- Cards Container -->
-                    <div id="live-cards-container" class="grid grid-cols-1 md:grid-cols-2 gap-5">
+                    <div id="live-cards-container" class="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-5">
                         <!-- Populated by JS -->
                     </div>
 
                     <!-- Empty State for Live Cards -->
-                    <div id="no-cards-play-warning" class="hidden text-center py-16 bg-slate-900/40 rounded-3xl border border-dashed border-slate-800 p-6">
+                    <div id="no-cards-play-warning" class="hidden text-center py-12 sm:py-16 bg-slate-900/40 rounded-3xl border border-dashed border-slate-800 p-6">
                         <div class="w-12 h-12 bg-slate-900 rounded-2xl flex items-center justify-center mx-auto mb-3 text-slate-500 border border-slate-800">
                             <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path></svg>
                         </div>
@@ -385,6 +397,85 @@
         </div>
     </div>
 
+    <!-- ================= MODAL: EXPORT / SHARE DATA (iOS Safari Compatible) ================= -->
+    <div id="export-modal" class="fixed inset-0 z-50 bg-slate-950/85 backdrop-blur-md hidden flex items-center justify-center p-4 overflow-y-auto">
+        <div class="bg-slate-900 border border-slate-800 w-full max-w-md rounded-3xl shadow-2xl overflow-hidden my-8">
+            <div class="px-6 py-4 border-b border-slate-800 flex justify-between items-center bg-slate-950/50">
+                <h3 class="text-lg font-bold text-white font-heading">Export & Share Game Data</h3>
+                <button onclick="closeExportModal()" class="text-slate-400 hover:text-white p-1.5 rounded-xl hover:bg-slate-800 transition">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+                </button>
+            </div>
+
+            <div class="p-6 space-y-4">
+                <p class="text-xs text-slate-300">
+                    Use <strong class="text-emerald-400">Web Share</strong> to save directly to iOS Files/Notes, copy to clipboard, or download directly.
+                </p>
+
+                <div class="flex flex-col sm:flex-row gap-2">
+                    <button onclick="triggerWebShareExport()" class="flex-1 py-2.5 px-3 bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs rounded-xl shadow flex items-center justify-center gap-1.5">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z"></path></svg>
+                        Share / Save File
+                    </button>
+                    <button onclick="copyExportTextToClipboard()" class="flex-1 py-2.5 px-3 bg-indigo-600 hover:bg-indigo-500 text-white font-bold text-xs rounded-xl shadow flex items-center justify-center gap-1.5">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m0 0h2a2 2 0 012 2v3m2 4H10m0 0l3-3m-3 3l3 3"></path></svg>
+                        Copy JSON Text
+                    </button>
+                    <button onclick="downloadJSONFileDirect()" class="py-2.5 px-3 bg-slate-800 hover:bg-slate-700 text-slate-300 font-bold text-xs rounded-xl border border-slate-700 transition" title="Direct File Download">
+                        Download
+                    </button>
+                </div>
+
+                <div>
+                    <label class="block text-[11px] font-bold uppercase tracking-wider text-slate-400 mb-1">Exported JSON Data</label>
+                    <textarea id="export-json-textarea" readonly rows="6" class="w-full bg-slate-950 border border-slate-800 rounded-xl p-3 text-xs text-amber-300 font-mono leading-relaxed focus:outline-none select-all"></textarea>
+                </div>
+
+                <div class="flex justify-between items-center pt-2">
+                    <span id="export-status-message" class="text-xs font-semibold text-emerald-400"></span>
+                    <button onclick="closeExportModal()" class="px-4 py-2 bg-slate-800 text-slate-300 text-xs font-semibold rounded-xl">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ================= MODAL: IMPORT DATA (iOS Safari File + Paste Compatible) ================= -->
+    <div id="import-modal" class="fixed inset-0 z-50 bg-slate-950/85 backdrop-blur-md hidden flex items-center justify-center p-4 overflow-y-auto">
+        <div class="bg-slate-900 border border-slate-800 w-full max-w-md rounded-3xl shadow-2xl overflow-hidden my-8">
+            <div class="px-6 py-4 border-b border-slate-800 flex justify-between items-center bg-slate-950/50">
+                <h3 class="text-lg font-bold text-white font-heading">Import Game Data</h3>
+                <button onclick="closeImportModal()" class="text-slate-400 hover:text-white p-1.5 rounded-xl hover:bg-slate-800 transition">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+                </button>
+            </div>
+
+            <div class="p-6 space-y-4">
+                <p class="text-xs text-slate-300">
+                    Import game rounds and cards by choosing a JSON file or pasting JSON text directly.
+                </p>
+
+                <!-- Method A: File Upload -->
+                <div class="p-3 bg-slate-950/80 rounded-2xl border border-slate-800">
+                    <label class="block text-xs font-bold text-purple-400 mb-1">Method 1: Select JSON File</label>
+                    <input type="file" accept=".json" onchange="importDataFromFileInput(event)" class="text-xs text-slate-400 file:mr-3 file:py-1.5 file:px-3 file:rounded-xl file:border-0 file:text-xs file:font-semibold file:bg-purple-600 file:text-white hover:file:bg-purple-500 cursor-pointer">
+                </div>
+
+                <!-- Method B: Direct Paste -->
+                <div class="space-y-1.5">
+                    <label class="block text-xs font-bold text-amber-400">Method 2: Paste JSON Text</label>
+                    <textarea id="import-json-textarea" rows="6" placeholder='Paste JSON data here, e.g. {"rounds": [...], "cards": [...]}' class="w-full bg-slate-950 border border-slate-800 rounded-xl p-3 text-xs text-white font-mono leading-relaxed focus:outline-none focus:border-purple-500 placeholder-slate-700"></textarea>
+                </div>
+
+                <div id="import-error-msg" class="text-xs font-semibold text-rose-400 hidden"></div>
+
+                <div class="flex justify-end gap-3 pt-2">
+                    <button onclick="closeImportModal()" class="px-4 py-2 bg-slate-800 text-slate-300 text-xs font-semibold rounded-xl">Cancel</button>
+                    <button onclick="executeImportFromTextarea()" class="px-5 py-2 bg-purple-600 hover:bg-purple-500 text-white text-xs font-bold rounded-xl shadow">Import JSON</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <!-- ================= BINGO CELEBRATION MODAL ================= -->
     <div id="winner-modal" class="fixed inset-0 z-50 bg-slate-950/90 backdrop-blur-lg hidden flex items-center justify-center p-4">
         <div class="bg-gradient-to-b from-slate-900 to-slate-950 border-2 border-amber-400/80 w-full max-w-md rounded-3xl p-8 text-center shadow-2xl animate-glow relative overflow-hidden">
@@ -418,7 +509,7 @@
     </div>
 
     <script>
-        // State initialized with clean single Round 1 and empty cards on startup
+        // State initialized on startup
         window.state = {
             rounds: [{ id: 'round-1', name: 'Round 1' }],
             cards: [],            // Array of { id, roundId, name, numbers: [Int] }
@@ -427,7 +518,7 @@
             useGlobalDrawn: false,   // Boolean flag for global vs per-round tracking
             activeRoundId: 'round-1',// Currently selected round ID for play/setup
             setupFilterRoundId: 'all', // 'all' or specific roundId
-            currentTab: 'cards',  // Default startup main tab: 'cards' (1. Setup Rounds & Cards)
+            currentTab: 'cards',  // Default startup tab: 'cards' (1. Setup Rounds & Cards)
             filterMode: 'all',    // 'all' | 'close' | 'bingo'
             maxNumber: 90,        // Keypad range
             keypadCollapsed: false, // Collapsible keypad state
@@ -466,7 +557,7 @@
             }
         };
 
-        // Active Drawn Array Helper
+        // Helper to get current active array of called numbers
         window.getActiveDrawnArray = function() {
             if (state.useGlobalDrawn) {
                 return state.globalDrawnNumbers;
@@ -493,10 +584,10 @@
                 
                 if (t === tab) {
                     viewEl.classList.remove('hidden');
-                    if (btnEl) btnEl.className = "px-4 py-2 rounded-xl text-sm font-bold transition flex items-center gap-2 bg-emerald-600 text-white shadow-md shadow-emerald-600/30";
+                    if (btnEl) btnEl.className = "px-2.5 sm:px-4 py-1.5 sm:py-2 rounded-lg sm:rounded-xl text-xs sm:text-sm font-bold transition flex items-center gap-1.5 bg-emerald-600 text-white shadow-md shadow-emerald-600/30";
                 } else {
                     viewEl.classList.add('hidden');
-                    if (btnEl) btnEl.className = "px-4 py-2 rounded-xl text-sm font-semibold text-slate-400 hover:text-white hover:bg-slate-800 transition flex items-center gap-2";
+                    if (btnEl) btnEl.className = "px-2.5 sm:px-4 py-1.5 sm:py-2 rounded-lg sm:rounded-xl text-xs sm:text-sm font-semibold text-slate-400 hover:text-white hover:bg-slate-800 transition flex items-center gap-1.5";
                 }
             });
 
@@ -504,7 +595,7 @@
             if (tab === 'cards') renderSetupCards();
         };
 
-        // --- KEYPAD & NUMBER CALL ENGINE ---
+        // --- KEYPAD & CALL NUMBER LOGIC ---
 
         window.toggleKeypadCollapse = function() {
             state.keypadCollapsed = !state.keypadCollapsed;
@@ -542,7 +633,7 @@
             for (let i = 1; i <= state.maxNumber; i++) {
                 const isDrawn = activeDrawn.includes(i);
                 html += `
-                    <button type="button" onclick="toggleNumberCall(${i})" class="aspect-square rounded-xl text-xs font-black transition-all duration-150 flex items-center justify-center ${
+                    <button type="button" onclick="toggleNumberCall(${i})" class="aspect-square rounded-lg sm:rounded-xl text-xs font-black transition-all duration-150 flex items-center justify-center ${
                         isDrawn 
                             ? 'bg-amber-500 text-slate-950 font-black ring-2 ring-amber-400 shadow-md shadow-amber-500/30 scale-105' 
                             : 'bg-slate-900 text-slate-300 hover:bg-slate-800 hover:text-white border border-slate-800'
@@ -596,7 +687,7 @@
             }
         };
 
-        // Instant reset without confirm modal
+        // Instant reset without confirmation
         window.clearAllDrawnNumbers = function() {
             if (state.useGlobalDrawn) {
                 state.globalDrawnNumbers = [];
@@ -608,7 +699,7 @@
             updateUI();
         };
 
-        // --- LIVE MULTI-ROUND TRACKER ---
+        // --- LIVE TRACKER & CARD CALCULATION ---
 
         window.calculateCardProgress = function(card) {
             let drawnList = [];
@@ -662,7 +753,7 @@
                 }
 
                 return `
-                    <button onclick="setActiveRound('${round.id}')" class="px-4 py-2 rounded-2xl text-xs font-bold transition flex items-center gap-2 whitespace-nowrap ${
+                    <button onclick="setActiveRound('${round.id}')" class="px-3.5 sm:px-4 py-1.5 sm:py-2 rounded-xl sm:rounded-2xl text-xs font-bold transition flex items-center gap-2 whitespace-nowrap ${
                         isActive 
                             ? 'bg-purple-600 text-white shadow-lg shadow-purple-600/30 border border-purple-400/40' 
                             : 'bg-slate-900 text-slate-300 hover:bg-slate-800 border border-slate-800'
@@ -736,18 +827,18 @@
                             : remaining <= 2 
                                 ? 'border-emerald-500/80 ring-2 ring-emerald-500/20' 
                                 : 'border-slate-800'
-                    } rounded-3xl p-5 transition-all duration-300 relative overflow-hidden flex flex-col justify-between">
+                    } rounded-2xl sm:rounded-3xl p-4 sm:p-5 transition-all duration-300 relative overflow-hidden flex flex-col justify-between">
                         
                         ${isBingo ? `
                             <div class="absolute top-0 right-0 bg-gradient-to-r from-amber-400 to-amber-500 text-slate-950 font-black text-[10px] px-3 py-1 rounded-bl-xl uppercase tracking-wider font-heading shadow-md animate-pulse">
-                                ★ BINGO WINNER!
+                                ★ WINNER!
                             </div>
                         ` : ''}
 
                         <div>
                             <div class="flex justify-between items-start mb-2">
                                 <div>
-                                    <h3 class="text-lg font-bold text-white font-heading">${escapeHtml(card.name)}</h3>
+                                    <h3 class="text-base sm:text-lg font-bold text-white font-heading">${escapeHtml(card.name)}</h3>
                                     <span class="text-[11px] text-slate-400 font-medium">${total} Total Numbers</span>
                                 </div>
                                 <div class="text-right">
@@ -758,15 +849,15 @@
                                 </div>
                             </div>
 
-                            <div class="w-full bg-slate-950 rounded-full h-2 mb-4 overflow-hidden p-0.5 border border-slate-800">
+                            <div class="w-full bg-slate-950 rounded-full h-2 mb-3.5 overflow-hidden p-0.5 border border-slate-800">
                                 <div class="h-full rounded-full transition-all duration-500 ${isBingo ? 'bg-gradient-to-r from-amber-400 to-amber-500' : 'bg-gradient-to-r from-emerald-500 to-teal-400'}" style="width: ${pct}%"></div>
                             </div>
 
-                            <div class="bg-slate-950 p-3 rounded-2xl border border-slate-800/80 flex flex-wrap gap-1.5 max-h-[180px] overflow-y-auto">
+                            <div class="bg-slate-950 p-2.5 sm:p-3 rounded-xl sm:rounded-2xl border border-slate-800/80 flex flex-wrap gap-1.5 max-h-[180px] overflow-y-auto">
                                 ${card.numbers.map(val => {
                                     const isDaubed = drawnSet.has(val);
                                     return `
-                                        <div class="px-3 py-1.5 rounded-xl text-xs font-black transition-all ${
+                                        <div class="px-2.5 sm:px-3 py-1 sm:py-1.5 rounded-lg sm:rounded-xl text-xs font-black transition-all ${
                                             isDaubed 
                                                 ? 'bg-amber-500 text-slate-950 font-black shadow-md shadow-amber-500/30 daub-pop' 
                                                 : 'bg-slate-900 text-slate-300 border border-slate-800'
@@ -778,7 +869,7 @@
                             </div>
                         </div>
 
-                        <div class="flex justify-between items-center mt-4 pt-3 border-t border-slate-800/80 text-xs">
+                        <div class="flex justify-between items-center mt-3.5 pt-2.5 border-t border-slate-800/80 text-xs">
                             <button onclick="openCardModal('${card.id}')" class="text-slate-400 hover:text-white transition flex items-center gap-1 font-semibold">
                                 <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path></svg>
                                 Edit Card
@@ -799,9 +890,9 @@
             ['all', 'close', 'bingo'].forEach(m => {
                 const btn = document.getElementById(`filter-${m}`);
                 if (m === mode) {
-                    btn.className = "px-3 py-1.5 rounded-xl font-bold transition bg-emerald-600 text-white";
+                    btn.className = "px-2.5 sm:px-3 py-1 sm:py-1.5 rounded-lg sm:rounded-xl font-bold transition bg-emerald-600 text-white";
                 } else {
-                    btn.className = "px-3 py-1.5 rounded-xl font-medium text-slate-400 hover:text-white transition";
+                    btn.className = "px-2.5 sm:px-3 py-1 sm:py-1.5 rounded-lg sm:rounded-xl font-medium text-slate-400 hover:text-white transition";
                 }
             });
             renderLiveCards();
@@ -841,19 +932,19 @@
             } catch(e) {}
         };
 
-        // --- ROUND & CARD SETUP MANAGEMENT ---
+        // --- SETUP TAB OPERATIONS ---
 
         window.renderSetupCards = function() {
             document.getElementById('header-round-count').textContent = state.rounds.length;
 
             const tabsContainer = document.getElementById('setup-round-tabs');
             let tabsHtml = `
-                <button onclick="setSetupFilterRound('all')" class="px-4 py-2 rounded-2xl text-xs font-bold transition whitespace-nowrap ${
+                <button onclick="setSetupFilterRound('all')" class="px-3.5 py-1.5 sm:px-4 sm:py-2 rounded-xl sm:rounded-2xl text-xs font-bold transition whitespace-nowrap ${
                     state.setupFilterRoundId === 'all' 
                         ? 'bg-purple-600 text-white shadow-lg shadow-purple-600/30 border border-purple-400/40' 
                         : 'bg-slate-900 text-slate-400 hover:text-white border border-slate-800'
                 }">
-                    All Rounds (${state.cards.length} cards)
+                    All Rounds (${state.cards.length})
                 </button>
             `;
 
@@ -861,8 +952,8 @@
                 const count = state.cards.filter(c => c.roundId === round.id).length;
                 const isSel = state.setupFilterRoundId === round.id;
                 tabsHtml += `
-                    <div class="flex items-center rounded-2xl ${isSel ? 'bg-purple-600 text-white shadow-lg shadow-purple-600/30' : 'bg-slate-900 text-slate-300 border border-slate-800'} p-1 gap-1">
-                        <button onclick="setSetupFilterRound('${round.id}')" class="px-3 py-1 text-xs font-bold transition whitespace-nowrap">
+                    <div class="flex items-center rounded-xl sm:rounded-2xl ${isSel ? 'bg-purple-600 text-white shadow-lg shadow-purple-600/30' : 'bg-slate-900 text-slate-300 border border-slate-800'} p-1 gap-1">
+                        <button onclick="setSetupFilterRound('${round.id}')" class="px-2.5 py-1 text-xs font-bold transition whitespace-nowrap">
                             ${escapeHtml(round.name)} (${count})
                         </button>
                         <button onclick="openRoundModal('${round.id}')" class="p-1 hover:text-amber-300 transition text-slate-400" title="Rename Round">
@@ -896,7 +987,7 @@
                 const roundName = parentRound ? parentRound.name : 'Unassigned';
 
                 return `
-                    <div class="glass-panel p-5 rounded-3xl border border-slate-800 flex flex-col justify-between">
+                    <div class="glass-panel p-4 sm:p-5 rounded-2xl sm:rounded-3xl border border-slate-800 flex flex-col justify-between">
                         <div>
                             <div class="flex justify-between items-start mb-2">
                                 <div>
@@ -904,7 +995,7 @@
                                     <h3 class="text-base font-bold text-white font-heading">${escapeHtml(card.name)}</h3>
                                 </div>
                                 <div class="flex gap-1">
-                                    <button onclick="openCopyModal('${card.id}')" class="p-1.5 bg-slate-800 hover:bg-slate-700 text-purple-300 rounded-xl transition" title="Copy or Move to another Round">
+                                    <button onclick="openCopyModal('${card.id}')" class="p-1.5 bg-slate-800 hover:bg-slate-700 text-purple-300 rounded-xl transition" title="Copy or Move">
                                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7v8a2 2 0 002 2h6M8 7V5a2 2 0 012-2h6a2 2 0 012 2v2M8 7H6a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2v-2"></path></svg>
                                     </button>
                                     <button onclick="openCardModal('${card.id}')" class="p-1.5 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded-xl transition" title="Edit">
@@ -917,10 +1008,10 @@
                             </div>
 
                             <div class="text-xs text-slate-400 mb-3">
-                                Total Numbers Required: <strong class="text-white">${card.numbers.length}</strong>
+                                Total Numbers: <strong class="text-white">${card.numbers.length}</strong>
                             </div>
 
-                            <div class="bg-slate-950 p-3 rounded-2xl border border-slate-800 flex flex-wrap gap-1.5 max-h-[140px] overflow-y-auto">
+                            <div class="bg-slate-950 p-2.5 sm:p-3 rounded-xl sm:rounded-2xl border border-slate-800 flex flex-wrap gap-1.5 max-h-[140px] overflow-y-auto">
                                 ${card.numbers.map(n => `<span class="px-2.5 py-1 rounded-lg bg-slate-900 border border-slate-800 text-slate-300 text-xs font-bold">${n}</span>`).join('')}
                             </div>
                         </div>
@@ -934,7 +1025,7 @@
             renderSetupCards();
         };
 
-        // Round Modal Operations
+        // Round Modal
         window.openRoundModal = function(roundId = null) {
             const modal = document.getElementById('round-modal');
             const titleEl = document.getElementById('round-modal-title');
@@ -949,7 +1040,7 @@
                 editIdInput.value = roundId;
                 nameInput.value = round ? round.name : '';
             } else {
-                titleEl.textContent = 'Add New Round / Game';
+                titleEl.textContent = 'Add New Round';
                 editIdInput.value = '';
                 nameInput.value = `Round ${state.rounds.length + 1}`;
             }
@@ -980,7 +1071,7 @@
             updateUI();
         };
 
-        // Instant round deletion without confirm dialog
+        // Instant deletion without confirmation popups
         window.deleteRound = function(roundId) {
             state.rounds = state.rounds.filter(r => r.id !== roundId);
             state.cards = state.cards.filter(c => c.roundId !== roundId);
@@ -997,7 +1088,7 @@
             updateUI();
         };
 
-        // Card Modal Operations
+        // Card Modal
         window.openCardModal = function(cardId = null) {
             const modal = document.getElementById('card-modal');
             const titleEl = document.getElementById('card-modal-title');
@@ -1075,7 +1166,6 @@
             updateUI();
         };
 
-        // Instant card deletion without confirm dialog
         window.deleteCard = function(cardId) {
             state.cards = state.cards.filter(c => c.id !== cardId);
             state.announcedWinners.delete(cardId);
@@ -1083,7 +1173,7 @@
             updateUI();
         };
 
-        // Copy/Move Modal Operations
+        // Copy/Move Modal
         window.openCopyModal = function(cardId) {
             const card = state.cards.find(c => c.id === cardId);
             if (!card) return;
@@ -1130,7 +1220,6 @@
             updateUI();
         };
 
-        // Instant data clear without confirm modal
         window.deleteAllData = function() {
             state.rounds = [{ id: 'round-1', name: 'Round 1' }];
             state.cards = [];
@@ -1142,7 +1231,6 @@
             updateUI();
         };
 
-        // Optional Demo Set Setup button handler
         window.loadSampleGame = function() {
             const r1Id = 'round-demo-1';
             const r2Id = 'round-demo-2';
@@ -1168,43 +1256,138 @@
             updateUI();
         };
 
-        // Export/Import Data
-        window.exportDataJSON = function() {
-            const exportObj = {
+        // --- STREAMING_CHUNK:iOS Safari Web Share & Import/Export Engine ---
+
+        window.getExportJSONPayload = function() {
+            return JSON.stringify({
                 rounds: state.rounds,
                 cards: state.cards
-            };
-            const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(exportObj, null, 2));
-            const dlAnchor = document.createElement('a');
-            dlAnchor.setAttribute("href", dataStr);
-            dlAnchor.setAttribute("download", "bingo_multiround_backup.json");
-            document.body.appendChild(dlAnchor);
-            dlAnchor.click();
-            dlAnchor.remove();
+            }, null, 2);
         };
 
-        window.importDataJSON = function(event) {
+        window.handleExportData = function() {
+            const jsonString = getExportJSONPayload();
+            document.getElementById('export-json-textarea').value = jsonString;
+            document.getElementById('export-status-message').textContent = '';
+            document.getElementById('export-modal').classList.remove('hidden');
+        };
+
+        window.closeExportModal = function() {
+            document.getElementById('export-modal').classList.add('hidden');
+        };
+
+        // iOS Safari Web Share API Support
+        window.triggerWebShareExport = async function() {
+            const jsonString = getExportJSONPayload();
+            const statusEl = document.getElementById('export-status-message');
+
+            try {
+                // Try sharing as a file if supported (iOS 15+)
+                const file = new File([jsonString], "bingo_backup.json", { type: "application/json" });
+                if (navigator.canShare && navigator.canShare({ files: [file] })) {
+                    await navigator.share({
+                        files: [file],
+                        title: 'Bingo Tracker Backup',
+                        text: 'Bingo Tracker Rounds & Cards Backup Data'
+                    });
+                    statusEl.textContent = "Shared successfully!";
+                    return;
+                }
+                
+                // Fallback to text Web Share
+                if (navigator.share) {
+                    await navigator.share({
+                        title: 'Bingo Tracker Backup',
+                        text: jsonString
+                    });
+                    statusEl.textContent = "Shared text successfully!";
+                    return;
+                }
+            } catch(err) {
+                if (err.name !== 'AbortError') {
+                    console.warn('Share error', err);
+                }
+            }
+
+            // Fallback if navigator.share fails or is unavailable
+            copyExportTextToClipboard();
+        };
+
+        window.copyExportTextToClipboard = function() {
+            const textarea = document.getElementById('export-json-textarea');
+            textarea.select();
+            textarea.setSelectionRange(0, 99999); // Mobile compatibility
+
+            try {
+                document.execCommand('copy');
+                document.getElementById('export-status-message').textContent = "Copied to clipboard!";
+            } catch(e) {
+                document.getElementById('export-status-message').textContent = "Please manually select and copy text below.";
+            }
+        };
+
+        window.downloadJSONFileDirect = function() {
+            const jsonString = getExportJSONPayload();
+            const blob = new Blob([jsonString], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = "bingo_backup.json";
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+            document.getElementById('export-status-message').textContent = "Download triggered!";
+        };
+
+        // Import Modal & Handlers
+        window.openImportModal = function() {
+            document.getElementById('import-json-textarea').value = '';
+            document.getElementById('import-error-msg').classList.add('hidden');
+            document.getElementById('import-modal').classList.remove('hidden');
+        };
+
+        window.closeImportModal = function() {
+            document.getElementById('import-modal').classList.add('hidden');
+        };
+
+        window.importDataFromFileInput = function(event) {
             const file = event.target.files[0];
             if (!file) return;
             const reader = new FileReader();
             reader.onload = function(e) {
-                try {
-                    const imported = JSON.parse(e.target.result);
-                    if (imported.rounds && imported.cards) {
-                        state.rounds = imported.rounds;
-                        state.cards = imported.cards;
-                        state.activeRoundId = state.rounds[0] ? state.rounds[0].id : null;
-                        saveStateToStorage();
-                        updateUI();
-                    }
-                } catch(err) {
-                    console.error('Import failure', err);
-                }
+                processImportJSONText(e.target.result);
             };
             reader.readAsText(file);
         };
 
-        // Global UI Refresher
+        window.executeImportFromTextarea = function() {
+            const text = document.getElementById('import-json-textarea').value;
+            processImportJSONText(text);
+        };
+
+        window.processImportJSONText = function(text) {
+            const errorEl = document.getElementById('import-error-msg');
+            try {
+                const imported = JSON.parse(text);
+                if (imported && Array.isArray(imported.rounds) && Array.isArray(imported.cards)) {
+                    state.rounds = imported.rounds;
+                    state.cards = imported.cards;
+                    state.activeRoundId = state.rounds[0] ? state.rounds[0].id : null;
+                    saveStateToStorage();
+                    closeImportModal();
+                    updateUI();
+                } else {
+                    errorEl.textContent = "Invalid format. Expected object with 'rounds' and 'cards' arrays.";
+                    errorEl.classList.remove('hidden');
+                }
+            } catch(err) {
+                errorEl.textContent = "Syntax Error: Invalid JSON input.";
+                errorEl.classList.remove('hidden');
+            }
+        };
+
+        // UI Updates
         window.updateUI = function() {
             const activeDrawn = getActiveDrawnArray();
             renderNumberPadGrid();
@@ -1229,7 +1412,7 @@
         // App Initialization
         window.addEventListener('DOMContentLoaded', () => {
             loadStateFromStorage();
-            switchTab('cards'); // Default tab on start is Tab 1: Setup Rounds & Cards
+            switchTab('cards'); // Default tab on startup is Tab 1: Setup Rounds & Cards
             renderNumberPadGrid();
             applyKeypadCollapseState();
             updateUI();
