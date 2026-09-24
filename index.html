@@ -1,0 +1,1239 @@
+<!DOCTYPE html>
+<html lang="en" class="h-full bg-slate-950">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Multi-Round Freeform Bingo Card Tracker</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        amber: {
+                            400: '#fbbf24',
+                            500: '#f59e0b',
+                            600: '#d97706',
+                        },
+                        emerald: {
+                            400: '#34d399',
+                            500: '#10b981',
+                            600: '#059669',
+                            700: '#047857',
+                        }
+                    },
+                    animation: {
+                        'bounce-short': 'bounce 0.6s infinite 2',
+                        'glow': 'glow 2s ease-in-out infinite alternate',
+                    },
+                    keyframes: {
+                        glow: {
+                            '0%': { boxShadow: '0 0 10px rgba(245, 158, 11, 0.2)' },
+                            '100%': { boxShadow: '0 0 25px rgba(245, 158, 11, 0.7), 0 0 10px rgba(16, 185, 129, 0.5)' },
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@600;700;800;900&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Inter', sans-serif; }
+        h1, h2, h3, .font-heading { font-family: 'Outfit', sans-serif; }
+        .glass-panel {
+            background: rgba(15, 23, 42, 0.85);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+        }
+        .daub-pop {
+            animation: daubPop 0.25s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+        }
+        @keyframes daubPop {
+            0% { transform: scale(0.85); opacity: 0.6; }
+            50% { transform: scale(1.1); }
+            100% { transform: scale(1); opacity: 1; }
+        }
+        ::-webkit-scrollbar { width: 6px; height: 6px; }
+        ::-webkit-scrollbar-track { background: rgba(15, 23, 42, 0.6); }
+        ::-webkit-scrollbar-thumb { background: rgba(51, 65, 85, 0.6); border-radius: 9999px; }
+        ::-webkit-scrollbar-thumb:hover { background: rgba(16, 185, 129, 0.8); }
+    </style>
+</head>
+<body class="h-full text-slate-100 bg-slate-950 flex flex-col antialiased selection:bg-amber-500 selection:text-slate-950">
+
+    <header class="sticky top-0 z-40 bg-slate-900/90 border-b border-slate-800 backdrop-blur-md">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3 flex flex-wrap items-center justify-between gap-4">
+            
+            <!-- App Logo / Title -->
+            <div class="flex items-center gap-3">
+                <div class="w-10 h-10 rounded-2xl bg-gradient-to-tr from-amber-500 via-emerald-600 to-indigo-600 p-0.5 shadow-lg shadow-emerald-500/20">
+                    <div class="w-full h-full bg-slate-950 rounded-[14px] flex items-center justify-center font-black text-amber-400 text-xl font-heading">
+                        B
+                    </div>
+                </div>
+                <div>
+                    <div class="flex items-center gap-2">
+                        <h1 class="text-xl font-extrabold tracking-tight text-white font-heading">Bingo Tracker</h1>
+                        <span class="text-[10px] font-bold px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 uppercase tracking-wider">
+                            Multi-Round
+                        </span>
+                    </div>
+                    <p class="text-xs text-slate-400">Setup rounds & custom freeform cards, then track live calls</p>
+                </div>
+            </div>
+
+            <!-- Main Workflow Tabs (1. Setup -> 2. Live Game) -->
+            <nav class="flex items-center gap-1.5 bg-slate-950/90 p-1.5 rounded-2xl border border-slate-800">
+                <button id="tab-cards-btn" onclick="switchTab('cards')" class="px-4 py-2 rounded-xl text-sm font-bold transition flex items-center gap-2 bg-emerald-600 text-white shadow-md shadow-emerald-600/30">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"></path></svg>
+                    1. Setup Rounds & Cards (<span id="header-round-count">0</span>)
+                </button>
+                <button id="tab-play-btn" onclick="switchTab('play')" class="px-4 py-2 rounded-xl text-sm font-semibold text-slate-400 hover:text-white hover:bg-slate-800 transition flex items-center gap-2">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                    2. Live Game Tracker
+                </button>
+            </nav>
+
+        </div>
+    </header>
+
+    <main class="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6">
+
+        <!-- ================= TAB 1: SETUP ROUNDS & CARDS (DEFAULT MAIN TAB) ================= -->
+        <section id="view-cards" class="space-y-6">
+            
+            <!-- Setup Header Bar with Prominent "Start Live Game ➔" Button -->
+            <div class="glass-panel p-6 rounded-3xl border border-slate-800 flex flex-col lg:flex-row justify-between items-start lg:items-center gap-4">
+                <div>
+                    <h2 class="text-xl font-bold text-white font-heading">Round & Card Setup</h2>
+                    <p class="text-xs text-slate-400 mt-1">Configure game rounds, add freeform cards, or import existing sets before launching live tracking.</p>
+                </div>
+                
+                <div class="flex flex-wrap items-center gap-2.5 w-full lg:w-auto">
+                    <button onclick="switchTab('play')" class="px-5 py-2.5 bg-gradient-to-r from-emerald-500 to-emerald-600 hover:from-emerald-400 hover:to-emerald-500 text-slate-950 font-black text-xs rounded-xl transition shadow-lg shadow-emerald-500/20 flex items-center gap-2 font-heading tracking-wide uppercase">
+                        Start Live Game ➔
+                    </button>
+                    <button onclick="openRoundModal()" class="px-4 py-2.5 bg-purple-600 hover:bg-purple-500 text-white text-xs font-bold rounded-xl transition shadow-lg shadow-purple-600/20 flex items-center gap-2">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path></svg>
+                        New Round
+                    </button>
+                    <button onclick="openCardModal()" class="px-4 py-2.5 bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-bold rounded-xl transition shadow-lg shadow-indigo-600/20 flex items-center gap-2">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg>
+                        Add Freeform Card
+                    </button>
+                    <button onclick="loadSampleGame()" class="px-3.5 py-2.5 bg-amber-500/10 hover:bg-amber-500/20 text-amber-400 text-xs font-semibold rounded-xl border border-amber-500/20 transition">
+                        Load Demo Set
+                    </button>
+                    <button onclick="exportDataJSON()" class="px-3 py-2.5 bg-slate-900 hover:bg-slate-800 text-slate-300 text-xs font-semibold rounded-xl border border-slate-800 transition" title="Export JSON">
+                        Export
+                    </button>
+                    <label class="px-3 py-2.5 bg-slate-900 hover:bg-slate-800 text-slate-300 text-xs font-semibold rounded-xl border border-slate-800 transition cursor-pointer">
+                        Import <input type="file" accept=".json" onchange="importDataJSON(event)" class="hidden">
+                    </label>
+                    <button type="button" onclick="deleteAllData()" class="px-3 py-2.5 bg-rose-500/10 hover:bg-rose-500/20 text-rose-400 text-xs font-semibold rounded-xl border border-rose-500/20 transition">
+                        Clear All Data
+                    </button>
+                </div>
+            </div>
+
+            <!-- Round Filter Tabs in Setup -->
+            <div class="flex items-center gap-2 overflow-x-auto pb-2 scrollbar-none" id="setup-round-tabs">
+                <!-- Dynamically populated rounds -->
+            </div>
+
+            <!-- Setup Cards Grid -->
+            <div id="setup-cards-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                <!-- Populated dynamically via JS -->
+            </div>
+
+            <!-- Empty Setup State -->
+            <div id="empty-setup-state" class="text-center py-20 bg-slate-900/30 rounded-3xl border border-dashed border-slate-800">
+                <div class="w-16 h-16 bg-slate-900 rounded-3xl flex items-center justify-center mx-auto mb-4 text-slate-500 border border-slate-800">
+                    <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"></path></svg>
+                </div>
+                <h3 class="text-lg font-bold text-slate-300 font-heading">No Cards Configured</h3>
+                <p class="text-xs text-slate-500 max-w-sm mx-auto mt-1 mb-5">Get started by creating your first card or loading a pre-filled demo set.</p>
+                <div class="flex justify-center gap-3">
+                    <button onclick="openCardModal()" class="px-5 py-2.5 bg-indigo-600 hover:bg-indigo-500 text-white font-bold text-xs rounded-xl transition shadow">Add First Card</button>
+                    <button onclick="loadSampleGame()" class="px-5 py-2.5 bg-amber-500/20 hover:bg-amber-500/30 text-amber-300 font-semibold text-xs rounded-xl transition border border-amber-500/30">Load Demo Set</button>
+                </div>
+            </div>
+
+        </section>
+
+        <!-- ================= TAB 2: LIVE GAME TRACKER ================= -->
+        <section id="view-play" class="hidden space-y-6">
+            
+            <!-- Round Selection Bar with Back To Setup Button -->
+            <div class="glass-panel p-4 rounded-3xl border border-slate-800 flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+                <div class="flex items-center gap-3 w-full md:w-auto overflow-x-auto pb-2 md:pb-0 scrollbar-none" id="live-round-pills">
+                    <!-- Dynamic Round Pills with Status Badges -->
+                </div>
+
+                <div class="flex items-center gap-3 shrink-0 self-end md:self-auto">
+                    <button onclick="switchTab('cards')" class="px-3.5 py-1.5 text-xs font-bold bg-slate-900 hover:bg-slate-800 text-slate-300 rounded-xl border border-slate-700 transition flex items-center gap-1.5">
+                        <span>⚙️ Edit Setup / Cards</span>
+                    </button>
+                    <!-- Global vs Per-Round Toggle -->
+                    <label class="flex items-center gap-2 text-xs font-semibold text-slate-400 bg-slate-950/80 px-3 py-1.5 rounded-xl border border-slate-800 cursor-pointer select-none">
+                        <input type="checkbox" id="global-drawn-toggle" onchange="toggleGlobalDrawnMode(this.checked)" class="rounded bg-slate-900 border-slate-700 text-emerald-500 focus:ring-0">
+                        <span>Share Called Numbers Across All Rounds</span>
+                    </label>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+                
+                <!-- Left Column: Called Number Entry & Collapsible Quick Keypad -->
+                <div class="lg:col-span-4 space-y-5">
+                    
+                    <!-- Rapid Call Input Panel -->
+                    <div class="glass-panel p-5 rounded-3xl relative overflow-hidden shadow-2xl border border-slate-800">
+                        <div class="flex justify-between items-center mb-3">
+                            <span class="text-xs font-bold text-slate-400 uppercase tracking-wider">Number Call Entry</span>
+                            <span class="text-xs text-amber-400 font-semibold flex items-center gap-1.5">
+                                <span class="w-2 h-2 rounded-full bg-amber-400 animate-ping"></span> Live Tracking
+                            </span>
+                        </div>
+
+                        <!-- Form Input -->
+                        <form onsubmit="handleCallSubmit(event)" class="flex gap-2 mb-4">
+                            <input type="number" id="drawn-input" min="1" max="999" placeholder="Enter #" class="flex-1 bg-slate-950 border border-slate-700 focus:border-amber-500 rounded-2xl px-4 py-3 text-center text-2xl font-black text-white focus:outline-none focus:ring-2 focus:ring-amber-500/30 transition placeholder-slate-700 font-heading" autocomplete="off" autofocus>
+                            <button type="submit" class="px-6 py-3 bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-slate-950 font-black text-base rounded-2xl transition shadow-lg shadow-amber-500/20 active:scale-95 flex items-center justify-center font-heading tracking-wide">
+                                DRAW
+                            </button>
+                        </form>
+
+                        <!-- Call Status & History Controls -->
+                        <div class="flex items-center justify-between p-3.5 bg-slate-950/80 rounded-2xl border border-slate-800">
+                            <div>
+                                <span class="block text-[10px] font-bold text-slate-500 uppercase tracking-widest">Last Called</span>
+                                <span id="display-last-called" class="text-3xl font-black text-amber-400 font-heading">--</span>
+                            </div>
+                            <div class="text-right">
+                                <span class="block text-[10px] font-bold text-slate-500 uppercase tracking-widest">Total Called</span>
+                                <span id="display-total-drawn" class="text-xl font-bold text-white font-heading">0</span>
+                            </div>
+                            <button onclick="undoLastDrawn()" id="undo-btn" disabled class="px-3 py-2 text-xs font-bold bg-slate-900 hover:bg-slate-800 text-slate-300 disabled:opacity-30 rounded-xl border border-slate-800 transition flex items-center gap-1">
+                                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h10a8 8 0 018 8v2M3 10l6 6m-6-6l6-6"></path></svg>
+                                Undo
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Collapsible Quick Keypad (1 - 90) -->
+                    <div class="glass-panel p-4 rounded-3xl border border-slate-800 space-y-3">
+                        <div class="flex justify-between items-center px-1 cursor-pointer select-none" onclick="toggleKeypadCollapse()">
+                            <div class="flex items-center gap-2">
+                                <svg id="keypad-chevron" class="w-4 h-4 text-amber-400 transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+                                <h3 class="text-xs font-bold text-slate-300 uppercase tracking-wider">Quick Keypad (1 - 90)</h3>
+                            </div>
+                            <div class="flex items-center gap-3">
+                                <span id="keypad-toggle-label" class="text-[10px] font-semibold text-slate-400 uppercase tracking-wider">Collapse</span>
+                                <button type="button" onclick="event.stopPropagation(); clearAllDrawnNumbers();" class="text-xs font-semibold text-rose-400 hover:text-rose-300 transition flex items-center gap-1">
+                                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path></svg>
+                                    Reset Called
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Interactive Grid Container with smooth collapse -->
+                        <div id="keypad-collapse-container" class="transition-all duration-300 ease-in-out overflow-hidden max-h-[300px] opacity-100">
+                            <div id="number-pad-grid" class="grid grid-cols-6 sm:grid-cols-9 lg:grid-cols-6 gap-1.5 max-h-[300px] overflow-y-auto pr-1 pt-1">
+                                <!-- Populated dynamically via JS -->
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+
+                <!-- Right Column: Live Cards for Selected Round -->
+                <div class="lg:col-span-8 space-y-5">
+                    
+                    <!-- Filters & Sort Info Bar -->
+                    <div class="glass-panel p-4 rounded-3xl border border-slate-800 flex flex-wrap items-center justify-between gap-4">
+                        <div class="flex items-center gap-1.5 bg-slate-950/80 p-1 rounded-2xl border border-slate-800 text-xs">
+                            <button onclick="setCardFilter('all')" id="filter-all" class="px-3 py-1.5 rounded-xl font-bold transition bg-emerald-600 text-white">All Cards (<span id="count-all">0</span>)</button>
+                            <button onclick="setCardFilter('close')" id="filter-close" class="px-3 py-1.5 rounded-xl font-medium text-slate-400 hover:text-white transition">1-2 Away (<span id="count-close">0</span>)</button>
+                            <button onclick="setCardFilter('bingo')" id="filter-bingo" class="px-3 py-1.5 rounded-xl font-medium text-slate-400 hover:text-white transition">BINGO! (<span id="count-bingo">0</span>)</button>
+                        </div>
+
+                        <div class="text-xs text-slate-400 font-medium flex items-center gap-1.5">
+                            <svg class="w-4 h-4 text-amber-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4h13M3 8h9m-9 4h6m4 0l4-4m0 0l4 4m-4-4v12"></path></svg>
+                            <span>Sorted by closest to completion</span>
+                        </div>
+                    </div>
+
+                    <!-- Cards Container -->
+                    <div id="live-cards-container" class="grid grid-cols-1 md:grid-cols-2 gap-5">
+                        <!-- Populated by JS -->
+                    </div>
+
+                    <!-- Empty State for Live Cards -->
+                    <div id="no-cards-play-warning" class="hidden text-center py-16 bg-slate-900/40 rounded-3xl border border-dashed border-slate-800 p-6">
+                        <div class="w-12 h-12 bg-slate-900 rounded-2xl flex items-center justify-center mx-auto mb-3 text-slate-500 border border-slate-800">
+                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path></svg>
+                        </div>
+                        <h3 class="text-base font-bold text-slate-200 font-heading">No Cards in this Round</h3>
+                        <p class="text-xs text-slate-400 max-w-sm mx-auto mt-1 mb-4">Add player cards to this round or select another active round.</p>
+                        <button onclick="switchTab('cards')" class="px-5 py-2.5 bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs rounded-xl shadow transition">Go to Setup & Add Cards</button>
+                    </div>
+
+                </div>
+
+            </div>
+
+        </section>
+
+    </main>
+
+    <!-- ================= MODAL: ADD / EDIT ROUND ================= -->
+    <div id="round-modal" class="fixed inset-0 z-50 bg-slate-950/85 backdrop-blur-md hidden flex items-center justify-center p-4 overflow-y-auto">
+        <div class="bg-slate-900 border border-slate-800 w-full max-w-md rounded-3xl shadow-2xl overflow-hidden my-8">
+            <div class="px-6 py-4 border-b border-slate-800 flex justify-between items-center bg-slate-950/50">
+                <h3 id="round-modal-title" class="text-lg font-bold text-white font-heading">Add New Round</h3>
+                <button onclick="closeRoundModal()" class="text-slate-400 hover:text-white p-1.5 rounded-xl hover:bg-slate-800 transition">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+                </button>
+            </div>
+
+            <form onsubmit="saveRoundForm(event)" class="p-6 space-y-4">
+                <input type="hidden" id="edit-round-id" value="">
+
+                <div>
+                    <label class="block text-xs font-bold uppercase tracking-wider text-slate-400 mb-1.5">Round / Game Name</label>
+                    <input type="text" id="modal-round-name" required placeholder="e.g. Round 1 - Standard" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-2.5 text-sm text-white placeholder-slate-600 focus:outline-none focus:border-purple-500 font-semibold">
+                </div>
+
+                <div class="flex justify-end gap-3 pt-3 border-t border-slate-800">
+                    <button type="button" onclick="closeRoundModal()" class="px-4 py-2 bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-semibold rounded-xl transition">Cancel</button>
+                    <button type="submit" class="px-5 py-2 bg-purple-600 hover:bg-purple-500 text-white text-xs font-bold rounded-xl transition shadow-lg shadow-purple-600/30">Save Round</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- ================= MODAL: ADD / EDIT CARD ================= -->
+    <div id="card-modal" class="fixed inset-0 z-50 bg-slate-950/85 backdrop-blur-md hidden flex items-center justify-center p-4 overflow-y-auto">
+        <div class="bg-slate-900 border border-slate-800 w-full max-w-lg rounded-3xl shadow-2xl overflow-hidden my-8">
+            <div class="px-6 py-4 border-b border-slate-800 flex justify-between items-center bg-slate-950/50">
+                <h3 id="card-modal-title" class="text-lg font-bold text-white font-heading">Add Freeform Card</h3>
+                <button onclick="closeCardModal()" class="text-slate-400 hover:text-white p-1.5 rounded-xl hover:bg-slate-800 transition">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+                </button>
+            </div>
+
+            <form onsubmit="saveCardForm(event)" class="p-6 space-y-4">
+                <input type="hidden" id="edit-card-id" value="">
+
+                <div>
+                    <label class="block text-xs font-bold uppercase tracking-wider text-slate-400 mb-1.5">Assign to Round / Game</label>
+                    <select id="modal-card-round-id" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-2.5 text-sm text-white focus:outline-none focus:border-emerald-500 font-semibold">
+                        <!-- Populated via JS -->
+                    </select>
+                </div>
+
+                <div>
+                    <label class="block text-xs font-bold uppercase tracking-wider text-slate-400 mb-1.5">Card Name / Owner</label>
+                    <input type="text" id="modal-card-name" required placeholder="e.g. Card #1 or Sarah's Card" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-2.5 text-sm text-white placeholder-slate-600 focus:outline-none focus:border-emerald-500 font-semibold">
+                </div>
+
+                <div>
+                    <div class="flex justify-between items-center mb-1.5">
+                        <label class="block text-xs font-bold uppercase tracking-wider text-slate-400">Card Numbers</label>
+                        <button type="button" onclick="clearCardModalInputs()" class="text-[11px] text-amber-400 hover:text-amber-300 font-semibold">Reset Fields</button>
+                    </div>
+                    <textarea id="modal-card-numbers" rows="5" required placeholder="e.g. 5, 12, 23, 34, 45, 67, 72, 88" class="w-full bg-slate-950 border border-slate-800 rounded-xl p-3.5 text-sm text-white focus:outline-none focus:border-emerald-500 font-mono leading-relaxed placeholder-slate-700"></textarea>
+                    <p class="text-[11px] text-slate-500 mt-1">Separate numbers by spaces, commas, or line breaks.</p>
+                </div>
+
+                <div class="flex justify-end gap-3 pt-3 border-t border-slate-800">
+                    <button type="button" onclick="closeCardModal()" class="px-4 py-2 bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-semibold rounded-xl transition">Cancel</button>
+                    <button type="submit" class="px-5 py-2 bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold rounded-xl transition shadow-lg shadow-emerald-600/30">Save Card</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- ================= MODAL: COPY / MOVE CARD TO ROUND ================= -->
+    <div id="copy-card-modal" class="fixed inset-0 z-50 bg-slate-950/85 backdrop-blur-md hidden flex items-center justify-center p-4">
+        <div class="bg-slate-900 border border-slate-800 w-full max-w-sm rounded-3xl shadow-2xl p-6">
+            <h3 class="text-base font-bold text-white font-heading mb-3">Copy / Move Card</h3>
+            <p class="text-xs text-slate-400 mb-4" id="copy-modal-card-label">Selected Card</p>
+
+            <input type="hidden" id="copy-card-source-id">
+
+            <div class="space-y-3">
+                <div>
+                    <label class="block text-[10px] font-bold uppercase text-slate-400 mb-1">Target Round</label>
+                    <select id="copy-target-round-id" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs text-white">
+                        <!-- Populated via JS -->
+                    </select>
+                </div>
+
+                <div class="flex gap-2 pt-2">
+                    <button onclick="executeCopyCard(false)" class="flex-1 py-2 bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs rounded-xl shadow">
+                        Duplicate Card
+                    </button>
+                    <button onclick="executeCopyCard(true)" class="flex-1 py-2 bg-slate-800 hover:bg-slate-700 text-slate-200 font-bold text-xs rounded-xl border border-slate-700">
+                        Move Card
+                    </button>
+                </div>
+                <button onclick="closeCopyModal()" class="w-full py-1.5 text-slate-400 hover:text-white text-xs">Cancel</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ================= BINGO CELEBRATION MODAL ================= -->
+    <div id="winner-modal" class="fixed inset-0 z-50 bg-slate-950/90 backdrop-blur-lg hidden flex items-center justify-center p-4">
+        <div class="bg-gradient-to-b from-slate-900 to-slate-950 border-2 border-amber-400/80 w-full max-w-md rounded-3xl p-8 text-center shadow-2xl animate-glow relative overflow-hidden">
+            <div class="absolute -top-12 -right-12 w-32 h-32 bg-amber-400/20 rounded-full blur-2xl"></div>
+            <div class="absolute -bottom-12 -left-12 w-32 h-32 bg-emerald-500/20 rounded-full blur-2xl"></div>
+
+            <div class="w-20 h-20 bg-gradient-to-tr from-amber-400 to-amber-600 rounded-3xl mx-auto flex items-center justify-center text-slate-950 font-black text-4xl shadow-xl shadow-amber-500/30 mb-4 animate-bounce-short font-heading">
+                🏆
+            </div>
+
+            <h2 class="text-3xl font-black text-amber-400 font-heading tracking-wide uppercase">BINGO!</h2>
+            <p class="text-base font-bold text-white mt-1" id="winner-card-title">Card Hit BINGO!</p>
+            <p class="text-xs text-slate-400 mt-1">All numbers on this freeform card have been matched!</p>
+
+            <div class="my-6 p-4 bg-slate-900/90 rounded-2xl border border-amber-400/30 flex justify-around">
+                <div>
+                    <span class="block text-[10px] uppercase tracking-wider text-slate-400 font-bold">Winner</span>
+                    <span id="winner-card-name" class="text-lg font-extrabold text-amber-300 font-heading">Card Name</span>
+                </div>
+                <div class="border-r border-slate-800"></div>
+                <div>
+                    <span class="block text-[10px] uppercase tracking-wider text-slate-400 font-bold">Round</span>
+                    <span id="winner-round-name" class="text-lg font-extrabold text-emerald-300 font-heading">Round 1</span>
+                </div>
+            </div>
+
+            <button onclick="closeWinnerModal()" class="w-full py-3 bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-slate-950 font-black rounded-2xl shadow-xl transition transform active:scale-95 font-heading tracking-wide">
+                CONTINUE PLAYING
+            </button>
+        </div>
+    </div>
+
+    <script>
+        // State initialized with clean single Round 1 and empty cards on startup
+        window.state = {
+            rounds: [{ id: 'round-1', name: 'Round 1' }],
+            cards: [],            // Array of { id, roundId, name, numbers: [Int] }
+            drawnNumbersByRound: {}, // Map of roundId -> [Int]
+            globalDrawnNumbers: [],  // Stack of global drawn numbers if in global mode
+            useGlobalDrawn: false,   // Boolean flag for global vs per-round tracking
+            activeRoundId: 'round-1',// Currently selected round ID for play/setup
+            setupFilterRoundId: 'all', // 'all' or specific roundId
+            currentTab: 'cards',  // Default startup main tab: 'cards' (1. Setup Rounds & Cards)
+            filterMode: 'all',    // 'all' | 'close' | 'bingo'
+            maxNumber: 90,        // Keypad range
+            keypadCollapsed: false, // Collapsible keypad state
+            announcedWinners: new Set() // Prevent repeated popups
+        };
+
+        // Local Storage Persistence
+        window.saveStateToStorage = function() {
+            const data = {
+                rounds: state.rounds,
+                cards: state.cards,
+                drawnNumbersByRound: state.drawnNumbersByRound,
+                globalDrawnNumbers: state.globalDrawnNumbers,
+                useGlobalDrawn: state.useGlobalDrawn,
+                activeRoundId: state.activeRoundId,
+                keypadCollapsed: state.keypadCollapsed
+            };
+            localStorage.setItem('bingo_multiround_freeform_tracker', JSON.stringify(data));
+        };
+
+        window.loadStateFromStorage = function() {
+            const saved = localStorage.getItem('bingo_multiround_freeform_tracker');
+            if (saved) {
+                try {
+                    const parsed = JSON.parse(saved);
+                    state.rounds = parsed.rounds && parsed.rounds.length > 0 ? parsed.rounds : [{ id: 'round-1', name: 'Round 1' }];
+                    state.cards = parsed.cards || [];
+                    state.drawnNumbersByRound = parsed.drawnNumbersByRound || {};
+                    state.globalDrawnNumbers = parsed.globalDrawnNumbers || [];
+                    state.useGlobalDrawn = !!parsed.useGlobalDrawn;
+                    state.activeRoundId = parsed.activeRoundId || (state.rounds[0] ? state.rounds[0].id : null);
+                    state.keypadCollapsed = !!parsed.keypadCollapsed;
+                } catch(e) {
+                    console.error('Storage parse error', e);
+                }
+            }
+        };
+
+        // Active Drawn Array Helper
+        window.getActiveDrawnArray = function() {
+            if (state.useGlobalDrawn) {
+                return state.globalDrawnNumbers;
+            }
+            if (!state.activeRoundId) return [];
+            if (!state.drawnNumbersByRound[state.activeRoundId]) {
+                state.drawnNumbersByRound[state.activeRoundId] = [];
+            }
+            return state.drawnNumbersByRound[state.activeRoundId];
+        };
+
+        window.toggleGlobalDrawnMode = function(enabled) {
+            state.useGlobalDrawn = enabled;
+            saveStateToStorage();
+            updateUI();
+        };
+
+        // Tab Switcher (1. Setup Rounds & Cards -> 2. Live Game Tracker)
+        window.switchTab = function(tab) {
+            state.currentTab = tab;
+            ['cards', 'play'].forEach(t => {
+                const viewEl = document.getElementById(`view-${t}`);
+                const btnEl = document.getElementById(`tab-${t}-btn`);
+                
+                if (t === tab) {
+                    viewEl.classList.remove('hidden');
+                    if (btnEl) btnEl.className = "px-4 py-2 rounded-xl text-sm font-bold transition flex items-center gap-2 bg-emerald-600 text-white shadow-md shadow-emerald-600/30";
+                } else {
+                    viewEl.classList.add('hidden');
+                    if (btnEl) btnEl.className = "px-4 py-2 rounded-xl text-sm font-semibold text-slate-400 hover:text-white hover:bg-slate-800 transition flex items-center gap-2";
+                }
+            });
+
+            if (tab === 'play') renderLiveCards();
+            if (tab === 'cards') renderSetupCards();
+        };
+
+        // --- KEYPAD & NUMBER CALL ENGINE ---
+
+        window.toggleKeypadCollapse = function() {
+            state.keypadCollapsed = !state.keypadCollapsed;
+            saveStateToStorage();
+            applyKeypadCollapseState();
+        };
+
+        window.applyKeypadCollapseState = function() {
+            const container = document.getElementById('keypad-collapse-container');
+            const chevron = document.getElementById('keypad-chevron');
+            const label = document.getElementById('keypad-toggle-label');
+
+            if (!container || !chevron || !label) return;
+
+            if (state.keypadCollapsed) {
+                container.style.maxHeight = '0px';
+                container.style.opacity = '0';
+                container.style.pointerEvents = 'none';
+                chevron.classList.add('-rotate-90');
+                label.textContent = 'Expand';
+            } else {
+                container.style.maxHeight = '300px';
+                container.style.opacity = '1';
+                container.style.pointerEvents = 'auto';
+                chevron.classList.remove('-rotate-90');
+                label.textContent = 'Collapse';
+            }
+        };
+
+        window.renderNumberPadGrid = function() {
+            const container = document.getElementById('number-pad-grid');
+            if (!container) return;
+            const activeDrawn = getActiveDrawnArray();
+            let html = '';
+            for (let i = 1; i <= state.maxNumber; i++) {
+                const isDrawn = activeDrawn.includes(i);
+                html += `
+                    <button type="button" onclick="toggleNumberCall(${i})" class="aspect-square rounded-xl text-xs font-black transition-all duration-150 flex items-center justify-center ${
+                        isDrawn 
+                            ? 'bg-amber-500 text-slate-950 font-black ring-2 ring-amber-400 shadow-md shadow-amber-500/30 scale-105' 
+                            : 'bg-slate-900 text-slate-300 hover:bg-slate-800 hover:text-white border border-slate-800'
+                    }">${i}</button>
+                `;
+            }
+            container.innerHTML = html;
+        };
+
+        window.handleCallSubmit = function(e) {
+            e.preventDefault();
+            const input = document.getElementById('drawn-input');
+            const val = parseInt(input.value);
+            if (!isNaN(val) && val >= 1) {
+                callNumber(val);
+                input.value = '';
+                input.focus();
+            }
+        };
+
+        window.toggleNumberCall = function(num) {
+            const activeDrawn = getActiveDrawnArray();
+            if (activeDrawn.includes(num)) {
+                if (state.useGlobalDrawn) {
+                    state.globalDrawnNumbers = state.globalDrawnNumbers.filter(n => n !== num);
+                } else if (state.activeRoundId) {
+                    state.drawnNumbersByRound[state.activeRoundId] = state.drawnNumbersByRound[state.activeRoundId].filter(n => n !== num);
+                }
+            } else {
+                callNumber(num);
+            }
+            saveStateToStorage();
+            updateUI();
+        };
+
+        window.callNumber = function(num) {
+            const activeDrawn = getActiveDrawnArray();
+            if (!activeDrawn.includes(num)) {
+                activeDrawn.push(num);
+                saveStateToStorage();
+                updateUI();
+            }
+        };
+
+        window.undoLastDrawn = function() {
+            const activeDrawn = getActiveDrawnArray();
+            if (activeDrawn.length > 0) {
+                activeDrawn.pop();
+                saveStateToStorage();
+                updateUI();
+            }
+        };
+
+        // Instant reset without confirm modal
+        window.clearAllDrawnNumbers = function() {
+            if (state.useGlobalDrawn) {
+                state.globalDrawnNumbers = [];
+            } else if (state.activeRoundId) {
+                state.drawnNumbersByRound[state.activeRoundId] = [];
+            }
+            state.announcedWinners.clear();
+            saveStateToStorage();
+            updateUI();
+        };
+
+        // --- LIVE MULTI-ROUND TRACKER ---
+
+        window.calculateCardProgress = function(card) {
+            let drawnList = [];
+            if (state.useGlobalDrawn) {
+                drawnList = state.globalDrawnNumbers;
+            } else {
+                drawnList = state.drawnNumbersByRound[card.roundId] || [];
+            }
+
+            const drawnSet = new Set(drawnList);
+            const total = card.numbers.length;
+            if (total === 0) return { matched: 0, total: 0, remaining: 0, pct: 0, isBingo: false };
+
+            const matched = card.numbers.filter(n => drawnSet.has(n)).length;
+            const remaining = total - matched;
+            const pct = Math.round((matched / total) * 100);
+            const isBingo = remaining === 0;
+
+            return { matched, total, remaining, pct, isBingo };
+        };
+
+        window.renderLiveRoundPills = function() {
+            const container = document.getElementById('live-round-pills');
+            const toggleEl = document.getElementById('global-drawn-toggle');
+            if (toggleEl) toggleEl.checked = state.useGlobalDrawn;
+
+            if (state.rounds.length === 0) {
+                container.innerHTML = `<span class="text-xs text-slate-500 font-medium">No rounds defined.</span>`;
+                return;
+            }
+
+            container.innerHTML = state.rounds.map(round => {
+                const isActive = round.id === state.activeRoundId;
+                const roundCards = state.cards.filter(c => c.roundId === round.id);
+                
+                let badgeHtml = '';
+                if (roundCards.length > 0) {
+                    const stats = roundCards.map(c => calculateCardProgress(c));
+                    const winnerCount = stats.filter(s => s.isBingo).length;
+                    const closeCount = stats.filter(s => !s.isBingo && s.remaining <= 2).length;
+
+                    if (winnerCount > 0) {
+                        badgeHtml = `<span class="px-2 py-0.5 rounded-full text-[10px] font-black bg-amber-400 text-slate-950 font-heading animate-pulse">BINGO! (${winnerCount})</span>`;
+                    } else if (closeCount > 0) {
+                        badgeHtml = `<span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-500/30 text-emerald-300 border border-emerald-500/30">${closeCount} close</span>`;
+                    } else {
+                        badgeHtml = `<span class="px-2 py-0.5 rounded-full text-[10px] font-medium bg-slate-800 text-slate-400">${roundCards.length} cards</span>`;
+                    }
+                } else {
+                    badgeHtml = `<span class="px-2 py-0.5 rounded-full text-[10px] font-medium bg-slate-900 text-slate-600">0 cards</span>`;
+                }
+
+                return `
+                    <button onclick="setActiveRound('${round.id}')" class="px-4 py-2 rounded-2xl text-xs font-bold transition flex items-center gap-2 whitespace-nowrap ${
+                        isActive 
+                            ? 'bg-purple-600 text-white shadow-lg shadow-purple-600/30 border border-purple-400/40' 
+                            : 'bg-slate-900 text-slate-300 hover:bg-slate-800 border border-slate-800'
+                    }">
+                        <span>${escapeHtml(round.name)}</span>
+                        ${badgeHtml}
+                    </button>
+                `;
+            }).join('');
+        };
+
+        window.setActiveRound = function(roundId) {
+            state.activeRoundId = roundId;
+            saveStateToStorage();
+            updateUI();
+        };
+
+        window.renderLiveCards = function() {
+            renderLiveRoundPills();
+            const container = document.getElementById('live-cards-container');
+            const warningEl = document.getElementById('no-cards-play-warning');
+
+            const roundCards = state.cards.filter(c => c.roundId === state.activeRoundId);
+
+            if (roundCards.length === 0) {
+                container.innerHTML = '';
+                warningEl.classList.remove('hidden');
+                return;
+            }
+            warningEl.classList.add('hidden');
+
+            const calculatedCards = roundCards.map(card => ({
+                ...card,
+                stats: calculateCardProgress(card)
+            }));
+
+            document.getElementById('count-all').textContent = calculatedCards.length;
+            document.getElementById('count-close').textContent = calculatedCards.filter(c => c.stats.remaining >= 1 && c.stats.remaining <= 2).length;
+            document.getElementById('count-bingo').textContent = calculatedCards.filter(c => c.stats.isBingo).length;
+
+            let filtered = calculatedCards.filter(card => {
+                if (state.filterMode === 'close') return card.stats.remaining >= 1 && card.stats.remaining <= 2;
+                if (state.filterMode === 'bingo') return card.stats.isBingo;
+                return true;
+            });
+
+            filtered.sort((a, b) => {
+                if (a.stats.isBingo && !b.stats.isBingo) return -1;
+                if (!a.stats.isBingo && b.stats.isBingo) return 1;
+                return a.stats.remaining - b.stats.remaining;
+            });
+
+            const activeDrawn = getActiveDrawnArray();
+            const drawnSet = new Set(activeDrawn);
+
+            filtered.forEach(c => {
+                if (c.stats.isBingo && !state.announcedWinners.has(c.id)) {
+                    state.announcedWinners.add(c.id);
+                    const roundObj = state.rounds.find(r => r.id === c.roundId);
+                    triggerBingoWinnerModal(c, roundObj ? roundObj.name : '');
+                }
+            });
+
+            container.innerHTML = filtered.map(card => {
+                const { matched, total, remaining, pct, isBingo } = card.stats;
+
+                return `
+                    <div class="glass-panel border ${
+                        isBingo 
+                            ? 'border-amber-400 ring-4 ring-amber-500/20 bg-amber-500/5' 
+                            : remaining <= 2 
+                                ? 'border-emerald-500/80 ring-2 ring-emerald-500/20' 
+                                : 'border-slate-800'
+                    } rounded-3xl p-5 transition-all duration-300 relative overflow-hidden flex flex-col justify-between">
+                        
+                        ${isBingo ? `
+                            <div class="absolute top-0 right-0 bg-gradient-to-r from-amber-400 to-amber-500 text-slate-950 font-black text-[10px] px-3 py-1 rounded-bl-xl uppercase tracking-wider font-heading shadow-md animate-pulse">
+                                ★ BINGO WINNER!
+                            </div>
+                        ` : ''}
+
+                        <div>
+                            <div class="flex justify-between items-start mb-2">
+                                <div>
+                                    <h3 class="text-lg font-bold text-white font-heading">${escapeHtml(card.name)}</h3>
+                                    <span class="text-[11px] text-slate-400 font-medium">${total} Total Numbers</span>
+                                </div>
+                                <div class="text-right">
+                                    <span class="text-xs font-black ${isBingo ? 'text-amber-400' : remaining <= 2 ? 'text-emerald-400 font-bold' : 'text-slate-300'}">
+                                        ${isBingo ? '100% MATCHED' : remaining === 1 ? '🔥 1 AWAY!' : remaining + ' away'}
+                                    </span>
+                                    <span class="block text-[10px] text-slate-500 font-medium">${matched} / ${total} daubed</span>
+                                </div>
+                            </div>
+
+                            <div class="w-full bg-slate-950 rounded-full h-2 mb-4 overflow-hidden p-0.5 border border-slate-800">
+                                <div class="h-full rounded-full transition-all duration-500 ${isBingo ? 'bg-gradient-to-r from-amber-400 to-amber-500' : 'bg-gradient-to-r from-emerald-500 to-teal-400'}" style="width: ${pct}%"></div>
+                            </div>
+
+                            <div class="bg-slate-950 p-3 rounded-2xl border border-slate-800/80 flex flex-wrap gap-1.5 max-h-[180px] overflow-y-auto">
+                                ${card.numbers.map(val => {
+                                    const isDaubed = drawnSet.has(val);
+                                    return `
+                                        <div class="px-3 py-1.5 rounded-xl text-xs font-black transition-all ${
+                                            isDaubed 
+                                                ? 'bg-amber-500 text-slate-950 font-black shadow-md shadow-amber-500/30 daub-pop' 
+                                                : 'bg-slate-900 text-slate-300 border border-slate-800'
+                                        }">
+                                            ${val}
+                                        </div>
+                                    `;
+                                }).join('')}
+                            </div>
+                        </div>
+
+                        <div class="flex justify-between items-center mt-4 pt-3 border-t border-slate-800/80 text-xs">
+                            <button onclick="openCardModal('${card.id}')" class="text-slate-400 hover:text-white transition flex items-center gap-1 font-semibold">
+                                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path></svg>
+                                Edit Card
+                            </button>
+                            <button onclick="deleteCard('${card.id}')" class="text-rose-400 hover:text-rose-300 transition flex items-center gap-1 font-semibold">
+                                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
+                                Delete
+                            </button>
+                        </div>
+
+                    </div>
+                `;
+            }).join('');
+        };
+
+        window.setCardFilter = function(mode) {
+            state.filterMode = mode;
+            ['all', 'close', 'bingo'].forEach(m => {
+                const btn = document.getElementById(`filter-${m}`);
+                if (m === mode) {
+                    btn.className = "px-3 py-1.5 rounded-xl font-bold transition bg-emerald-600 text-white";
+                } else {
+                    btn.className = "px-3 py-1.5 rounded-xl font-medium text-slate-400 hover:text-white transition";
+                }
+            });
+            renderLiveCards();
+        };
+
+        // --- WINNER CELEBRATION ---
+        window.triggerBingoWinnerModal = function(card, roundName) {
+            document.getElementById('winner-card-title').textContent = `${card.name} HAS HIT BINGO!`;
+            document.getElementById('winner-card-name').textContent = card.name;
+            document.getElementById('winner-round-name').textContent = roundName || 'Round';
+            document.getElementById('winner-modal').classList.remove('hidden');
+            playAudioBeep();
+        };
+
+        window.closeWinnerModal = function() {
+            document.getElementById('winner-modal').classList.add('hidden');
+        };
+
+        window.playAudioBeep = function() {
+            try {
+                const AudioCtx = window.AudioContext || window.webkitAudioContext;
+                if (!AudioCtx) return;
+                const ctx = new AudioCtx();
+                const notes = [523.25, 659.25, 783.99, 1046.50];
+                notes.forEach((freq, idx) => {
+                    const osc = ctx.createOscillator();
+                    const gain = ctx.createGain();
+                    osc.type = 'triangle';
+                    osc.frequency.value = freq;
+                    gain.gain.setValueAtTime(0.12, ctx.currentTime + idx * 0.1);
+                    gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + idx * 0.1 + 0.35);
+                    osc.connect(gain);
+                    gain.connect(ctx.destination);
+                    osc.start(ctx.currentTime + idx * 0.1);
+                    osc.stop(ctx.currentTime + idx * 0.1 + 0.35);
+                });
+            } catch(e) {}
+        };
+
+        // --- ROUND & CARD SETUP MANAGEMENT ---
+
+        window.renderSetupCards = function() {
+            document.getElementById('header-round-count').textContent = state.rounds.length;
+
+            const tabsContainer = document.getElementById('setup-round-tabs');
+            let tabsHtml = `
+                <button onclick="setSetupFilterRound('all')" class="px-4 py-2 rounded-2xl text-xs font-bold transition whitespace-nowrap ${
+                    state.setupFilterRoundId === 'all' 
+                        ? 'bg-purple-600 text-white shadow-lg shadow-purple-600/30 border border-purple-400/40' 
+                        : 'bg-slate-900 text-slate-400 hover:text-white border border-slate-800'
+                }">
+                    All Rounds (${state.cards.length} cards)
+                </button>
+            `;
+
+            state.rounds.forEach(round => {
+                const count = state.cards.filter(c => c.roundId === round.id).length;
+                const isSel = state.setupFilterRoundId === round.id;
+                tabsHtml += `
+                    <div class="flex items-center rounded-2xl ${isSel ? 'bg-purple-600 text-white shadow-lg shadow-purple-600/30' : 'bg-slate-900 text-slate-300 border border-slate-800'} p-1 gap-1">
+                        <button onclick="setSetupFilterRound('${round.id}')" class="px-3 py-1 text-xs font-bold transition whitespace-nowrap">
+                            ${escapeHtml(round.name)} (${count})
+                        </button>
+                        <button onclick="openRoundModal('${round.id}')" class="p-1 hover:text-amber-300 transition text-slate-400" title="Rename Round">
+                            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"></path></svg>
+                        </button>
+                        <button onclick="deleteRound('${round.id}')" class="p-1 hover:text-rose-400 transition text-slate-400" title="Delete Round">
+                            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
+                        </button>
+                    </div>
+                `;
+            });
+            tabsContainer.innerHTML = tabsHtml;
+
+            const gridContainer = document.getElementById('setup-cards-grid');
+            const emptyEl = document.getElementById('empty-setup-state');
+
+            let displayCards = state.cards;
+            if (state.setupFilterRoundId !== 'all') {
+                displayCards = state.cards.filter(c => c.roundId === state.setupFilterRoundId);
+            }
+
+            if (displayCards.length === 0) {
+                gridContainer.innerHTML = '';
+                emptyEl.classList.remove('hidden');
+                return;
+            }
+            emptyEl.classList.add('hidden');
+
+            gridContainer.innerHTML = displayCards.map(card => {
+                const parentRound = state.rounds.find(r => r.id === card.roundId);
+                const roundName = parentRound ? parentRound.name : 'Unassigned';
+
+                return `
+                    <div class="glass-panel p-5 rounded-3xl border border-slate-800 flex flex-col justify-between">
+                        <div>
+                            <div class="flex justify-between items-start mb-2">
+                                <div>
+                                    <span class="text-[10px] font-bold text-purple-400 uppercase tracking-widest">${escapeHtml(roundName)}</span>
+                                    <h3 class="text-base font-bold text-white font-heading">${escapeHtml(card.name)}</h3>
+                                </div>
+                                <div class="flex gap-1">
+                                    <button onclick="openCopyModal('${card.id}')" class="p-1.5 bg-slate-800 hover:bg-slate-700 text-purple-300 rounded-xl transition" title="Copy or Move to another Round">
+                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7v8a2 2 0 002 2h6M8 7V5a2 2 0 012-2h6a2 2 0 012 2v2M8 7H6a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2v-2"></path></svg>
+                                    </button>
+                                    <button onclick="openCardModal('${card.id}')" class="p-1.5 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded-xl transition" title="Edit">
+                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path></svg>
+                                    </button>
+                                    <button onclick="deleteCard('${card.id}')" class="p-1.5 bg-rose-500/10 hover:bg-rose-500/20 text-rose-400 rounded-xl transition" title="Delete Card">
+                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
+                                    </button>
+                                </div>
+                            </div>
+
+                            <div class="text-xs text-slate-400 mb-3">
+                                Total Numbers Required: <strong class="text-white">${card.numbers.length}</strong>
+                            </div>
+
+                            <div class="bg-slate-950 p-3 rounded-2xl border border-slate-800 flex flex-wrap gap-1.5 max-h-[140px] overflow-y-auto">
+                                ${card.numbers.map(n => `<span class="px-2.5 py-1 rounded-lg bg-slate-900 border border-slate-800 text-slate-300 text-xs font-bold">${n}</span>`).join('')}
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        };
+
+        window.setSetupFilterRound = function(roundId) {
+            state.setupFilterRoundId = roundId;
+            renderSetupCards();
+        };
+
+        // Round Modal Operations
+        window.openRoundModal = function(roundId = null) {
+            const modal = document.getElementById('round-modal');
+            const titleEl = document.getElementById('round-modal-title');
+            const nameInput = document.getElementById('modal-round-name');
+            const editIdInput = document.getElementById('edit-round-id');
+
+            modal.classList.remove('hidden');
+
+            if (roundId) {
+                const round = state.rounds.find(r => r.id === roundId);
+                titleEl.textContent = 'Edit Round Name';
+                editIdInput.value = roundId;
+                nameInput.value = round ? round.name : '';
+            } else {
+                titleEl.textContent = 'Add New Round / Game';
+                editIdInput.value = '';
+                nameInput.value = `Round ${state.rounds.length + 1}`;
+            }
+        };
+
+        window.closeRoundModal = function() {
+            document.getElementById('round-modal').classList.add('hidden');
+        };
+
+        window.saveRoundForm = function(e) {
+            e.preventDefault();
+            const roundId = document.getElementById('edit-round-id').value;
+            const name = document.getElementById('modal-round-name').value.trim();
+
+            if (!name) return;
+
+            if (roundId) {
+                const round = state.rounds.find(r => r.id === roundId);
+                if (round) round.name = name;
+            } else {
+                const newId = 'round-' + Date.now();
+                state.rounds.push({ id: newId, name });
+                if (!state.activeRoundId) state.activeRoundId = newId;
+            }
+
+            saveStateToStorage();
+            closeRoundModal();
+            updateUI();
+        };
+
+        // Instant round deletion without confirm dialog
+        window.deleteRound = function(roundId) {
+            state.rounds = state.rounds.filter(r => r.id !== roundId);
+            state.cards = state.cards.filter(c => c.roundId !== roundId);
+            delete state.drawnNumbersByRound[roundId];
+
+            if (state.activeRoundId === roundId) {
+                state.activeRoundId = state.rounds.length > 0 ? state.rounds[0].id : null;
+            }
+            if (state.setupFilterRoundId === roundId) {
+                state.setupFilterRoundId = 'all';
+            }
+
+            saveStateToStorage();
+            updateUI();
+        };
+
+        // Card Modal Operations
+        window.openCardModal = function(cardId = null) {
+            const modal = document.getElementById('card-modal');
+            const titleEl = document.getElementById('card-modal-title');
+            const roundSelect = document.getElementById('modal-card-round-id');
+            const nameInput = document.getElementById('modal-card-name');
+            const numbersInput = document.getElementById('modal-card-numbers');
+            const editIdInput = document.getElementById('edit-card-id');
+
+            if (state.rounds.length === 0) {
+                openRoundModal();
+                return;
+            }
+
+            roundSelect.innerHTML = state.rounds.map(r => `<option value="${r.id}">${escapeHtml(r.name)}</option>`).join('');
+
+            modal.classList.remove('hidden');
+
+            if (cardId) {
+                const card = state.cards.find(c => c.id === cardId);
+                titleEl.textContent = 'Edit Freeform Card';
+                editIdInput.value = cardId;
+                roundSelect.value = card ? card.roundId : state.rounds[0].id;
+                nameInput.value = card ? card.name : '';
+                numbersInput.value = card ? card.numbers.join(', ') : '';
+            } else {
+                titleEl.textContent = 'Add Freeform Card';
+                editIdInput.value = '';
+                roundSelect.value = state.setupFilterRoundId !== 'all' ? state.setupFilterRoundId : state.activeRoundId;
+                nameInput.value = `Card #${state.cards.length + 1}`;
+                numbersInput.value = '';
+            }
+        };
+
+        window.clearCardModalInputs = function() {
+            document.getElementById('modal-card-name').value = '';
+            document.getElementById('modal-card-numbers').value = '';
+        };
+
+        window.closeCardModal = function() {
+            document.getElementById('card-modal').classList.add('hidden');
+        };
+
+        window.saveCardForm = function(e) {
+            e.preventDefault();
+            const cardId = document.getElementById('edit-card-id').value;
+            const roundId = document.getElementById('modal-card-round-id').value;
+            const name = document.getElementById('modal-card-name').value.trim();
+            const rawText = document.getElementById('modal-card-numbers').value;
+
+            const parsedNumbers = rawText.split(/[\s,]+/).map(n => parseInt(n)).filter(n => !isNaN(n) && n > 0);
+            const uniqueNumbers = Array.from(new Set(parsedNumbers)).sort((a,b) => a - b);
+
+            if (uniqueNumbers.length === 0) {
+                return;
+            }
+
+            if (cardId) {
+                const card = state.cards.find(c => c.id === cardId);
+                if (card) {
+                    card.roundId = roundId;
+                    card.name = name;
+                    card.numbers = uniqueNumbers;
+                }
+            } else {
+                state.cards.push({
+                    id: 'card-' + Date.now() + Math.random().toString(36).substr(2, 4),
+                    roundId,
+                    name,
+                    numbers: uniqueNumbers
+                });
+            }
+
+            saveStateToStorage();
+            closeCardModal();
+            updateUI();
+        };
+
+        // Instant card deletion without confirm dialog
+        window.deleteCard = function(cardId) {
+            state.cards = state.cards.filter(c => c.id !== cardId);
+            state.announcedWinners.delete(cardId);
+            saveStateToStorage();
+            updateUI();
+        };
+
+        // Copy/Move Modal Operations
+        window.openCopyModal = function(cardId) {
+            const card = state.cards.find(c => c.id === cardId);
+            if (!card) return;
+
+            document.getElementById('copy-card-source-id').value = cardId;
+            document.getElementById('copy-modal-card-label').textContent = `Card: ${card.name}`;
+
+            const selectEl = document.getElementById('copy-target-round-id');
+            selectEl.innerHTML = state.rounds
+                .filter(r => r.id !== card.roundId)
+                .map(r => `<option value="${r.id}">${escapeHtml(r.name)}</option>`).join('');
+
+            if (selectEl.options.length === 0) {
+                return;
+            }
+
+            document.getElementById('copy-card-modal').classList.remove('hidden');
+        };
+
+        window.closeCopyModal = function() {
+            document.getElementById('copy-card-modal').classList.add('hidden');
+        };
+
+        window.executeCopyCard = function(isMove) {
+            const cardId = document.getElementById('copy-card-source-id').value;
+            const targetRoundId = document.getElementById('copy-target-round-id').value;
+            const card = state.cards.find(c => c.id === cardId);
+
+            if (!card || !targetRoundId) return;
+
+            if (isMove) {
+                card.roundId = targetRoundId;
+            } else {
+                state.cards.push({
+                    id: 'card-' + Date.now() + Math.random().toString(36).substr(2, 4),
+                    roundId: targetRoundId,
+                    name: card.name + ' (Copy)',
+                    numbers: [...card.numbers]
+                });
+            }
+
+            saveStateToStorage();
+            closeCopyModal();
+            updateUI();
+        };
+
+        // Instant data clear without confirm modal
+        window.deleteAllData = function() {
+            state.rounds = [{ id: 'round-1', name: 'Round 1' }];
+            state.cards = [];
+            state.drawnNumbersByRound = {};
+            state.globalDrawnNumbers = [];
+            state.activeRoundId = 'round-1';
+            state.announcedWinners.clear();
+            saveStateToStorage();
+            updateUI();
+        };
+
+        // Optional Demo Set Setup button handler
+        window.loadSampleGame = function() {
+            const r1Id = 'round-demo-1';
+            const r2Id = 'round-demo-2';
+            const r3Id = 'round-demo-3';
+
+            state.rounds = [
+                { id: r1Id, name: "Game 1 - Regular" },
+                { id: r2Id, name: "Game 2 - Double Bingo" },
+                { id: r3Id, name: "Game 3 - Jackpot Round" }
+            ];
+
+            state.cards = [
+                { id: 'c1', roundId: r1Id, name: "Alex (Card #1)", numbers: [4, 12, 19, 23, 29, 35, 41, 48, 52, 60] },
+                { id: 'c2', roundId: r1Id, name: "Sam (Card #1)", numbers: [7, 14, 21, 33, 42, 55, 68, 77, 84, 89] },
+                { id: 'c3', roundId: r1Id, name: "Taylor (Card #1)", numbers: [3, 18, 27, 36, 45, 54, 63, 72, 80, 85] },
+                { id: 'c4', roundId: r2Id, name: "Alex (Card #2)", numbers: [5, 11, 22, 34, 49, 58, 62, 71, 83] },
+                { id: 'c5', roundId: r2Id, name: "Sam (Card #2)", numbers: [2, 16, 25, 38, 44, 51, 69, 75, 87] },
+                { id: 'c6', roundId: r3Id, name: "Jackpot - Team A", numbers: [1, 15, 30, 45, 60, 75, 90] }
+            ];
+
+            state.activeRoundId = r1Id;
+            saveStateToStorage();
+            updateUI();
+        };
+
+        // Export/Import Data
+        window.exportDataJSON = function() {
+            const exportObj = {
+                rounds: state.rounds,
+                cards: state.cards
+            };
+            const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(exportObj, null, 2));
+            const dlAnchor = document.createElement('a');
+            dlAnchor.setAttribute("href", dataStr);
+            dlAnchor.setAttribute("download", "bingo_multiround_backup.json");
+            document.body.appendChild(dlAnchor);
+            dlAnchor.click();
+            dlAnchor.remove();
+        };
+
+        window.importDataJSON = function(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                try {
+                    const imported = JSON.parse(e.target.result);
+                    if (imported.rounds && imported.cards) {
+                        state.rounds = imported.rounds;
+                        state.cards = imported.cards;
+                        state.activeRoundId = state.rounds[0] ? state.rounds[0].id : null;
+                        saveStateToStorage();
+                        updateUI();
+                    }
+                } catch(err) {
+                    console.error('Import failure', err);
+                }
+            };
+            reader.readAsText(file);
+        };
+
+        // Global UI Refresher
+        window.updateUI = function() {
+            const activeDrawn = getActiveDrawnArray();
+            renderNumberPadGrid();
+            
+            const lastCalledEl = document.getElementById('display-last-called');
+            const totalDrawnEl = document.getElementById('display-total-drawn');
+            const undoBtn = document.getElementById('undo-btn');
+
+            if (lastCalledEl) lastCalledEl.textContent = activeDrawn.length > 0 ? activeDrawn[activeDrawn.length - 1] : '--';
+            if (totalDrawnEl) totalDrawnEl.textContent = activeDrawn.length;
+            if (undoBtn) undoBtn.disabled = activeDrawn.length === 0;
+
+            if (state.currentTab === 'cards') renderSetupCards();
+            if (state.currentTab === 'play') renderLiveCards();
+        };
+
+        window.escapeHtml = function(text) {
+            const map = { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#039;' };
+            return (text || '').replace(/[&<>"']/g, m => map[m]);
+        };
+
+        // App Initialization
+        window.addEventListener('DOMContentLoaded', () => {
+            loadStateFromStorage();
+            switchTab('cards'); // Default tab on start is Tab 1: Setup Rounds & Cards
+            renderNumberPadGrid();
+            applyKeypadCollapseState();
+            updateUI();
+        });
+    </script>
+</body>
+</html>
